@@ -128,12 +128,12 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleStatus }: Tas
         <div className="flex items-center gap-1.5">
           <Calendar className="w-3.5 h-3.5 text-slate-400" />
           {task.dueDate ? (
-            <span>Due {new Date(task.dueDate).toLocaleDateString()}</span>
+            <span suppressHydrationWarning>Due {new Date(task.dueDate).toLocaleDateString()}</span>
           ) : (
             <span className="text-slate-400 italic">No due date</span>
           )}
         </div>
-        <span className="text-[11px] text-slate-400">
+        <span suppressHydrationWarning className="text-[11px] text-slate-400">
           {new Date(task.createdAt).toLocaleDateString(undefined, {
             month: "short",
             day: "numeric",

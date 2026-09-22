@@ -30,7 +30,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-center text-xs text-slate-400">
+        <div
+          suppressHydrationWarning
+          className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-center text-xs text-slate-400"
+        >
           &copy; {new Date().getFullYear()} TaskSync. Built for SDN302 Assignment 1.
         </div>
       </div>
