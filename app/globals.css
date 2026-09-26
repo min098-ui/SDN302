@@ -47,6 +47,7 @@ html[data-theme="ocean"] {
   --mascot-card-border: rgba(186, 230, 253, 0.85);
   --active-tab-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.35);
   --primary-btn-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3);
+  --focus-ring: #0284c7;
 }
 
 html[data-theme="sunset"] {
@@ -62,6 +63,7 @@ html[data-theme="sunset"] {
   --mascot-card-border: rgba(254, 215, 170, 0.85);
   --active-tab-shadow: 0 4px 14px 0 rgba(244, 63, 94, 0.35);
   --primary-btn-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.3);
+  --focus-ring: #e11d48;
 }
 
 .luminous-bg,
@@ -160,6 +162,21 @@ html[data-theme="sunset"] .mascot-sparkle-badge {
 .theme-mascot-card {
   border-color: var(--mascot-card-border);
   transition: border-color 0.5s ease;
+}
+
+.theme-modal-header {
+  background-image: linear-gradient(to right, rgba(224, 242, 254, 0.6), rgba(238, 242, 255, 0.4), rgba(243, 232, 255, 0.4));
+  transition: background-image 0.5s ease;
+}
+
+html[data-theme="sunset"] .theme-modal-header {
+  background-image: linear-gradient(to right, rgba(255, 237, 213, 0.6), rgba(254, 226, 226, 0.4), rgba(253, 230, 250, 0.4));
+}
+
+.theme-focus-ring:focus {
+  outline: none;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 2.5px var(--accent-bg-subtle) !important;
 }
 
 /* Card Accent Lines & Status Colors with Dynamic Theme Adaptation */
