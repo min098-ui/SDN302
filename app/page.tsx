@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 import {
   Plus,
   Search,
@@ -9,11 +10,19 @@ import {
   ListTodo,
   AlertCircle,
   RefreshCw,
+  LayoutGrid,
+  List,
+  Filter,
+  ArrowUpDown,
+  X,
   Sparkles,
+  Zap,
+  TrendingUp,
 } from "lucide-react";
 import TaskCard from "@/components/TaskCard";
+import TaskListView from "@/components/TaskListView";
 import TaskModal from "@/components/TaskModal";
-import { Task, TaskFormData, TaskStatus } from "@/lib/types";
+import { Task, TaskFormData, TaskStatus, TaskPriority } from "@/lib/types";
 
 export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -22,13 +31,16 @@ export default function HomePage() {
 
   // Filters & Search
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [priorityFilter, setPriorityFilter] = useState<string>("ALL");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "dueDate" | "title" | "priority">("newest");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  // Fetch tasks from GET /api/tasks
+  // Fetch tasks
   const fetchTasks = async () => {
     try {
       setLoading(true);
@@ -61,12 +73,9 @@ export default function HomePage() {
           throw new Error(`Failed to load tasks (Status: ${res.status})`);
         }
         const data = await res.json();
-        if (isMounted) {
-          setTasks(data);
-        }
+        if (isMounted) setTasks(data);
       } catch (err: unknown) {
         if (isMounted) {
-          console.error(err);
           setError(
             err instanceof Error
               ? err.message
@@ -74,14 +83,11 @@ export default function HomePage() {
           );
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
     initialLoad();
-
     return () => {
       isMounted = false;
     };
@@ -90,7 +96,6 @@ export default function HomePage() {
   // Handle Create or Update
   const handleFormSubmit = async (formData: TaskFormData) => {
     if (editingTask) {
-      // PUT /api/tasks/[id]
       const res = await fetch(`/api/tasks/${editingTask.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -105,7 +110,6 @@ export default function HomePage() {
       const updated = await res.json();
       setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
     } else {
-      // POST /api/tasks
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -143,7 +147,7 @@ export default function HomePage() {
     }
   };
 
-  // Toggle status quickly
+  // Toggle status
   const handleToggleStatus = async (task: Task) => {
     const nextStatus: Record<TaskStatus, TaskStatus> = {
       TODO: "IN_PROGRESS",
@@ -152,7 +156,6 @@ export default function HomePage() {
     };
     const newStatus = nextStatus[task.status];
 
-    // Optimistic update
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)));
 
     try {
@@ -163,7 +166,6 @@ export default function HomePage() {
       });
 
       if (!res.ok) {
-        // Revert on failure
         fetchTasks();
       }
     } catch {
@@ -183,227 +185,431 @@ export default function HomePage() {
     setIsModalOpen(true);
   };
 
-  // Filtered tasks
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((t) => {
-      const matchesStatus = statusFilter === "ALL" ? true : t.status === statusFilter;
-      const matchesSearch =
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (t.description && t.description.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesStatus && matchesSearch;
-    });
-  }, [tasks, statusFilter, searchQuery]);
-
   // Statistics
   const stats = useMemo(() => {
-    return {
-      total: tasks.length,
-      todo: tasks.filter((t) => t.status === "TODO").length,
-      inProgress: tasks.filter((t) => t.status === "IN_PROGRESS").length,
-      done: tasks.filter((t) => t.status === "DONE").length,
-    };
+    const total = tasks.length;
+    const todo = tasks.filter((t) => t.status === "TODO").length;
+    const inProgress = tasks.filter((t) => t.status === "IN_PROGRESS").length;
+    const done = tasks.filter((t) => t.status === "DONE").length;
+    const completionRate = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    return { total, todo, inProgress, done, completionRate };
   }, [tasks]);
 
+  // Filtered & Sorted tasks
+  const filteredTasks = useMemo(() => {
+    return tasks
+      .filter((t) => {
+        const matchesStatus = statusFilter === "ALL" ? true : t.status === statusFilter;
+        const matchesPriority = priorityFilter === "ALL" ? true : t.priority === priorityFilter;
+        const matchesSearch =
+          t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (t.description && t.description.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesStatus && matchesPriority && matchesSearch;
+      })
+      .sort((a, b) => {
+        if (sortBy === "newest") {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
+        if (sortBy === "oldest") {
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        }
+        if (sortBy === "title") {
+          return a.title.localeCompare(b.title);
+        }
+        if (sortBy === "priority") {
+          const pOrder: Record<TaskPriority, number> = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+          return pOrder[b.priority] - pOrder[a.priority];
+        }
+        if (sortBy === "dueDate") {
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        }
+        return 0;
+      });
+  }, [tasks, statusFilter, priorityFilter, searchQuery, sortBy]);
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-10">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-indigo-950 text-white p-8 md:p-12 shadow-xl border border-indigo-800/40">
-        <div className="relative z-10 max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            Assignment 1 &bull; Live CRUD Foundation
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 space-y-8">
+      {/* 
+        Eye-Catching Luminous Showcase Banner
+        Multi-color: Sky Blue + Royal Violet + Rose Pink
+        Not dark, not glaring white: silky frosted glass with vibrant aurora lights!
+      */}
+      <section className="relative overflow-hidden rounded-3xl p-8 sm:p-10 bg-white/75 backdrop-blur-2xl border border-white/90 shadow-xl shadow-sky-950/5">
+        {/* Colorful Aurora Ambient Spots */}
+        <div className="absolute -top-16 -left-16 w-72 h-72 theme-halo-1 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -right-16 w-80 h-80 theme-halo-2 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/3 left-1/2 w-64 h-64 theme-halo-3 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div className="space-y-4 max-w-2xl">
+            {/* Colorful Pill Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full theme-accent-badge border text-xs font-bold uppercase tracking-wider backdrop-blur-sm shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Enterprise Workspace &bull; Active Sprint</span>
+            </div>
+
+            {/* Glowing Gradient Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              Manage Tasks with <br />
+              <span className="theme-gradient-text">
+                Vibrant Clarity &amp; Ease
+              </span>
+            </h1>
+
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+              Track deliverables, synchronize workflows in real-time, and accomplish your milestones.
+              Built on <strong className="text-sky-700 font-semibold">Next.js 16</strong>,{" "}
+              <strong className="text-indigo-700 font-semibold">Prisma ORM</strong> &amp;{" "}
+              <strong className="text-emerald-700 font-semibold">Supabase</strong>.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <button
+                onClick={openCreateModal}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl theme-gradient-btn hover:scale-105 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-lg transition-all"
+              >
+                <Plus className="w-4 h-4 stroke-[3]" />
+                <span>Create New Task</span>
+              </button>
+              <button
+                onClick={fetchTasks}
+                className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl border border-slate-200/80 bg-white/90 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold backdrop-blur-sm transition-all shadow-xs hover:border-slate-300"
+                title="Refresh Workspace Data"
+              >
+                <RefreshCw className={`w-4 h-4 text-sky-600 ${loading ? "animate-spin" : ""}`} />
+                <span>Refresh Board</span>
+              </button>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-            Effortless Task &amp; <br />
-            <span className="bg-gradient-to-r from-sky-400 via-indigo-300 to-violet-300 bg-clip-text text-transparent">
-              Team Management
-            </span>
-          </h1>
+          {/* Right Mascot & Interactive Sprint Progress Showcase */}
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-4 items-center justify-center">
+            {/* Mascot Avatar Card with Glowing Halo */}
+            <div className="relative group p-4 rounded-3xl bg-white/90 border theme-mascot-card backdrop-blur-xl shadow-lg flex items-center gap-4 min-w-[270px]">
+              <div className="w-16 h-16 relative flex items-center justify-center shrink-0">
+                <div className="absolute inset-0 rounded-full blur-md group-hover:scale-110 transition-transform theme-halo-1" />
+                <Image
+                  src="/mascot-fox.png"
+                  alt="Snow Fox Mascot"
+                  width={62}
+                  height={62}
+                  className="object-contain relative z-10 animate-cute-float mascot-fox-img"
+                />
+              </div>
+              <div>
+                <div className="text-xs font-bold theme-gradient-text flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                  <span>Kitsune Workspace</span>
+                </div>
+                <div className="text-sm font-extrabold text-slate-900 mt-0.5">
+                  {stats.done === stats.total && stats.total > 0
+                    ? "All Goals Smashed! 🎉"
+                    : `${stats.inProgress + stats.todo} Tasks Active`}
+                </div>
+                <div className="text-[11px] text-slate-500">Ready for your next milestone</div>
+              </div>
+            </div>
 
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Welcome to <strong>TaskSync</strong>! This is the foundational version built with
-            Next.js App Router, Prisma ORM, and Supabase PostgreSQL. Create, track, and manage tasks
-            publicly in real-time.
-          </p>
-
-          <div className="pt-2 flex flex-wrap items-center gap-3">
-            <button
-              onClick={openCreateModal}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-              Create New Task
-            </button>
-            <button
-              onClick={fetchTasks}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium backdrop-blur-sm transition-colors"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-              Refresh
-            </button>
+            {/* Sprint Progress Card */}
+            <div className="p-4 rounded-3xl bg-white/90 border border-purple-200/70 backdrop-blur-xl shadow-lg shadow-purple-500/10 min-w-[270px]">
+              <div className="flex items-center justify-between text-xs font-bold mb-2">
+                <span className="text-purple-700 flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-purple-600" />
+                  Sprint Completion
+                </span>
+                <span className="text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full text-[11px] font-extrabold">
+                  {stats.completionRate}%
+                </span>
+              </div>
+              <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
+                <div
+                  className="h-full sprint-progress-bar rounded-full transition-all duration-700 shadow-xs"
+                  style={{ width: `${stats.completionRate}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 font-medium">
+                <span>Completed: <strong className="text-emerald-700">{stats.done}</strong></span>
+                <span>Remaining: <strong className="text-slate-700">{stats.todo + stats.inProgress}</strong></span>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Decorative background glow */}
-        <div className="absolute -right-16 -bottom-16 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
       </section>
 
-      {/* Quick Summary Cards */}
-      <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0">
-            <ListTodo className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+      {/* 4 Eye-Catching KPI Cards with 3 Rich Colors + Emerald */}
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Total Tasks - Royal Purple & Indigo */}
+        <div className="relative overflow-hidden rounded-2xl p-5 border border-indigo-200/80 bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-white/95 shadow-md shadow-indigo-500/5 hover:border-indigo-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-indigo-700 uppercase tracking-wider">
               Total Tasks
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-700 border border-indigo-200 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <ListTodo className="w-4 h-4" />
             </div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{stats.total}</div>
           </div>
+          <div className="text-3xl font-black text-slate-900 tracking-tight">{stats.total}</div>
+          <div className="text-[11px] text-indigo-600/90 font-medium mt-1">All workspace deliverables</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-            <Clock className="w-5 h-5" />
+        {/* Card 2: To Do - Warm Amber & Sunset Rose */}
+        <div className="relative overflow-hidden rounded-2xl p-5 border border-amber-200/80 bg-gradient-to-br from-amber-50/90 via-orange-50/50 to-white/95 shadow-md shadow-amber-500/5 hover:border-amber-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
+              To Do
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-800 border border-amber-200 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Clock className="w-4 h-4" />
+            </div>
           </div>
-          <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">To Do</div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{stats.todo}</div>
-          </div>
+          <div className="text-3xl font-black text-slate-900 tracking-tight">{stats.todo}</div>
+          <div className="text-[11px] text-amber-700/90 font-medium mt-1">Pending queue items</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+        {/* Card 3: In Progress - Electric Cyan & Sky Blue */}
+        <div className="relative overflow-hidden rounded-2xl p-5 border border-sky-200/80 bg-gradient-to-br from-sky-50/90 via-cyan-50/50 to-white/95 shadow-md shadow-sky-500/5 hover:border-sky-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-sky-700 uppercase tracking-wider">
               In Progress
-            </div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">
-              {stats.inProgress}
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-sky-500/15 text-sky-700 border border-sky-200 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Clock className="w-4 h-4 text-sky-600 animate-spin" style={{ animationDuration: "8s" }} />
             </div>
           </div>
+          <div className="text-3xl font-black text-slate-900 tracking-tight">{stats.inProgress}</div>
+          <div className="text-[11px] text-sky-600/90 font-medium mt-1">Active sprint focus</div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5" />
+        {/* Card 4: Done - Fresh Emerald & Teal */}
+        <div className="relative overflow-hidden rounded-2xl p-5 border border-emerald-200/80 bg-gradient-to-br from-emerald-50/90 via-teal-50/50 to-white/95 shadow-md shadow-emerald-500/5 hover:border-emerald-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
+              Completed
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-700 border border-emerald-200 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
           </div>
-          <div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Done</div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{stats.done}</div>
-          </div>
+          <div className="text-3xl font-black text-slate-900 tracking-tight">{stats.done}</div>
+          <div className="text-[11px] text-emerald-600/90 font-medium mt-1">Successfully delivered</div>
         </div>
       </section>
 
-      {/* Filter and Search Bar */}
+      {/* Control Toolbar: Multi-Color Tabs, Instant Search & View Mode */}
       <section className="space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          {/* Status Filter Buttons */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl overflow-x-auto">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white/80 backdrop-blur-xl p-3.5 rounded-2xl border border-white/90 shadow-md">
+          {/* Status Tabs with Multi-Color Pill Highlight */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
             {[
-              { id: "ALL", label: "All Tasks" },
-              { id: "TODO", label: "To Do" },
-              { id: "IN_PROGRESS", label: "In Progress" },
-              { id: "DONE", label: "Done" },
+              { id: "ALL", label: "All Tasks", count: stats.total },
+              { id: "TODO", label: "To Do", count: stats.todo },
+              { id: "IN_PROGRESS", label: "In Progress", count: stats.inProgress },
+              { id: "DONE", label: "Done", count: stats.done },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setStatusFilter(tab.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   statusFilter === tab.id
-                    ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                    ? "theme-active-tab font-bold"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
                 }`}
               >
-                {tab.label}
+                <span>{tab.label}</span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${
+                    statusFilter === tab.id
+                      ? "bg-white/20 text-white"
+                      : "bg-slate-100 text-slate-600 border border-slate-200"
+                  }`}
+                >
+                  {tab.count}
+                </span>
               </button>
             ))}
           </div>
 
-          {/* Search Input & Add Button */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 sm:w-64">
+          {/* Search, Filter By Priority, Sort & View Mode */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Search Input */}
+            <div className="relative flex-1 sm:w-64 min-w-[200px]">
               <input
                 type="text"
-                placeholder="Search tasks..."
+                placeholder="Search missions, notes..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-8 pr-7 py-2 rounded-xl border border-slate-200 bg-white/90 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 transition-all shadow-2xs"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-3 pointer-events-none" style={{ color: "var(--accent-color)" }} />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
-            <button
-              onClick={openCreateModal}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all shrink-0"
-            >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Add Task</span>
-            </button>
+            {/* Priority Selector */}
+            <div className="relative flex items-center">
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="appearance-none pl-7 pr-7 py-2 rounded-xl border border-slate-200 bg-white/90 text-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-slate-300 cursor-pointer shadow-2xs"
+              >
+                <option value="ALL">All Priorities</option>
+                <option value="HIGH">High Priority</option>
+                <option value="MEDIUM">Medium Priority</option>
+                <option value="LOW">Low Priority</option>
+              </select>
+              <Filter className="w-3.5 h-3.5 absolute left-2.5 pointer-events-none" style={{ color: "var(--accent-color)" }} />
+            </div>
+
+            {/* Sort Selector */}
+            <div className="relative flex items-center">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="appearance-none pl-7 pr-7 py-2 rounded-xl border border-slate-200 bg-white/90 text-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-slate-300 cursor-pointer shadow-2xs"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="dueDate">Due Date</option>
+                <option value="priority">Priority</option>
+                <option value="title">Title (A-Z)</option>
+              </select>
+              <ArrowUpDown className="w-3.5 h-3.5 absolute left-2.5 pointer-events-none" style={{ color: "var(--accent-color)" }} />
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center p-1 rounded-xl bg-slate-100/90 border border-slate-200/80">
+              <button
+                onClick={() => setViewMode("grid")}
+                title="Grid Cards View"
+                style={{ color: viewMode === "grid" ? "var(--accent-color)" : undefined }}
+                className={`p-1.5 rounded-lg text-xs transition-colors ${
+                  viewMode === "grid"
+                    ? "bg-white shadow-xs font-bold"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                title="Table List View"
+                style={{ color: viewMode === "list" ? "var(--accent-color)" : undefined }}
+                className={`p-1.5 rounded-lg text-xs transition-colors ${
+                  viewMode === "list"
+                    ? "bg-white shadow-xs font-bold"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Database Error Banner if any */}
         {error && (
-          <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3 text-amber-800 dark:text-amber-200 text-sm">
-            <AlertCircle className="w-5 h-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-800 text-sm shadow-xs">
+            <AlertCircle className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" />
             <div>
-              <p className="font-semibold">Database Notice</p>
-              <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">{error}</p>
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                Tip: If you haven&apos;t run the Supabase migration yet, configure your{" "}
-                <code>DATABASE_URL</code> in <code>.env</code> and run{" "}
+              <p className="font-bold flex items-center gap-1.5">
+                Database Notice
+                <span className="text-[10px] bg-amber-100 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-semibold">
+                  Setup Required
+                </span>
+              </p>
+              <p className="text-xs text-amber-700 mt-1">{error}</p>
+              <p className="text-xs text-amber-600 mt-2">
+                Tip: Configure your <code>DATABASE_URL</code> in <code>.env</code> and run{" "}
                 <code>npx prisma migrate dev --name init</code>.
               </p>
             </div>
           </div>
         )}
 
-        {/* Tasks Grid */}
+        {/* Tasks Render (Grid or List) */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((idx) => (
               <div
                 key={idx}
-                className="h-44 rounded-2xl bg-slate-100 dark:bg-slate-800/50 animate-pulse border border-slate-200 dark:border-slate-800"
+                className="h-44 rounded-2xl bg-white/70 animate-pulse border border-slate-200/80 shadow-xs"
               />
             ))}
           </div>
         ) : filteredTasks.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onEdit={openEditModal}
-                onDelete={handleDeleteTask}
-                onToggleStatus={handleToggleStatus}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16 px-4 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-900/40">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-500 mx-auto flex items-center justify-center mb-3">
-              <ListTodo className="w-6 h-6" />
+          viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onEdit={openEditModal}
+                  onDelete={handleDeleteTask}
+                  onToggleStatus={handleToggleStatus}
+                />
+              ))}
             </div>
-            <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
-              No tasks found
+          ) : (
+            <TaskListView
+              tasks={filteredTasks}
+              onEdit={openEditModal}
+              onDelete={handleDeleteTask}
+              onToggleStatus={handleToggleStatus}
+            />
+          )
+        ) : (
+          /* Polished Empty State with Snow Fox Mascot */
+          <div className="text-center py-16 px-4 rounded-3xl border border-dashed border-sky-300 bg-white/70 backdrop-blur-md shadow-xs">
+            <div className="w-24 h-24 mx-auto mb-4 relative animate-cute-float">
+              <Image
+                src="/mascot-fox.png"
+                alt="Snow Fox Mascot"
+                width={96}
+                height={96}
+                className="object-contain drop-shadow-md"
+              />
+            </div>
+
+            <h3 className="text-lg font-bold text-slate-800">
+              {searchQuery || statusFilter !== "ALL" || priorityFilter !== "ALL"
+                ? "No matching tasks found"
+                : "Workspace is all clear"}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 mb-4">
-              {searchQuery || statusFilter !== "ALL"
-                ? "No tasks match your current filter or search criteria."
-                : "Your board is empty. Get started by creating your first task!"}
+            <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-5">
+              {searchQuery || statusFilter !== "ALL" || priorityFilter !== "ALL"
+                ? "Try clearing your search query or adjusting your filters to find what you're looking for."
+                : "No active tasks in this queue. Create your first task to jumpstart your workflow!"}
             </p>
-            <button
-              onClick={openCreateModal}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Create Task</span>
-            </button>
+            {searchQuery || statusFilter !== "ALL" || priorityFilter !== "ALL" ? (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setStatusFilter("ALL");
+                  setPriorityFilter("ALL");
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors border border-slate-200"
+              >
+                Clear all filters
+              </button>
+            ) : (
+              <button
+                onClick={openCreateModal}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl theme-gradient-btn hover:scale-105 active:scale-95 text-white text-xs font-bold shadow-md transition-all"
+              >
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+                <span>Create First Task</span>
+              </button>
+            )}
           </div>
         )}
       </section>

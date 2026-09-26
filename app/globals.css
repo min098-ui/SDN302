@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
 }
 
 @theme inline {
@@ -12,15 +19,242 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background-color: #f0f4f9;
+  color: #1e293b;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* 
+  Dual Luminous Color Themes Tokens:
+  Theme 1: Ocean Sky Aurora (Sky Blue + Royal Violet + Rose Pink + Mint)
+  Theme 2: Sunset Coral (Warm Peach + Coral Rose + Lavender + Amber)
+  Full-palette synchronization across background, buttons, badges, typography, and halos!
+*/
+:root,
+html[data-theme="ocean"] {
+  --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #4f46e5 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #38bdf8 0%, #3b82f6 50%, #6366f1 100%);
+  --brand-text-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #9333ea 100%);
+  --accent-color: #0284c7;
+  --accent-bg-subtle: rgba(14, 165, 233, 0.12);
+  --accent-border: rgba(56, 189, 248, 0.45);
+  --halo-glow-1: rgba(56, 189, 248, 0.25);
+  --halo-glow-2: rgba(168, 85, 247, 0.22);
+  --halo-glow-3: rgba(244, 114, 182, 0.18);
+  --mascot-card-border: rgba(186, 230, 253, 0.85);
+  --active-tab-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.35);
+  --primary-btn-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3);
+}
+
+html[data-theme="sunset"] {
+  --primary-gradient: linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #f59e0b 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #fb7185 0%, #f472b6 50%, #fbbf24 100%);
+  --brand-text-gradient: linear-gradient(135deg, #e11d48 0%, #db2777 50%, #ea580c 100%);
+  --accent-color: #e11d48;
+  --accent-bg-subtle: rgba(244, 63, 94, 0.12);
+  --accent-border: rgba(251, 113, 133, 0.45);
+  --halo-glow-1: rgba(251, 146, 60, 0.28);
+  --halo-glow-2: rgba(244, 63, 94, 0.24);
+  --halo-glow-3: rgba(168, 85, 247, 0.18);
+  --mascot-card-border: rgba(254, 215, 170, 0.85);
+  --active-tab-shadow: 0 4px 14px 0 rgba(244, 63, 94, 0.35);
+  --primary-btn-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.3);
+}
+
+.luminous-bg,
+html[data-theme="ocean"] .luminous-bg,
+html[data-theme="ocean"] body {
+  background-color: #f1f5f9;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.30) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.25) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(244, 114, 182, 0.18) 0px, transparent 55%),
+    radial-gradient(at 0% 100%, rgba(45, 212, 191, 0.22) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.25) 0px, transparent 50%);
+  background-attachment: fixed;
+  transition: background-color 0.5s ease-in-out;
+}
+
+html[data-theme="sunset"] .luminous-bg,
+html[data-theme="sunset"] body {
+  background-color: #faf5f0;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(251, 146, 60, 0.32) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.26) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(168, 85, 247, 0.22) 0px, transparent 55%),
+    radial-gradient(at 0% 100%, rgba(251, 191, 36, 0.25) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(45, 212, 191, 0.20) 0px, transparent 50%);
+  background-attachment: fixed;
+  transition: background-color 0.5s ease-in-out;
+}
+
+/* Theme Utilities for Complete Synchronized Theme Transition */
+.theme-gradient-btn {
+  background-image: var(--primary-gradient);
+  box-shadow: var(--primary-btn-shadow);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+.theme-gradient-btn:hover {
+  background-image: var(--primary-gradient-hover);
+  box-shadow: var(--primary-btn-shadow);
+}
+
+.theme-gradient-text {
+  background-image: var(--brand-text-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  transition: all 0.5s ease;
+}
+
+/* Mascot Fox & Logo Color Synchronization */
+.mascot-fox-img {
+  transition: filter 0.5s ease-in-out;
+}
+
+html[data-theme="sunset"] .mascot-fox-img {
+  filter: hue-rotate(185deg) saturate(1.18);
+}
+
+.mascot-sparkle-badge {
+  background-image: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+  transition: background-image 0.5s ease;
+}
+
+html[data-theme="sunset"] .mascot-sparkle-badge {
+  background-image: linear-gradient(135deg, #fb923c 0%, #f43f5e 100%);
+}
+
+.theme-active-tab {
+  background-image: var(--primary-gradient);
+  color: #ffffff;
+  box-shadow: var(--active-tab-shadow);
+  transition: all 0.3s ease;
+}
+
+.theme-accent-badge {
+  background-color: var(--accent-bg-subtle);
+  border-color: var(--accent-border);
+  color: var(--accent-color);
+  transition: all 0.3s ease;
+}
+
+.theme-halo-1 {
+  background-color: var(--halo-glow-1);
+  transition: background-color 0.5s ease;
+}
+.theme-halo-2 {
+  background-color: var(--halo-glow-2);
+  transition: background-color 0.5s ease;
+}
+.theme-halo-3 {
+  background-color: var(--halo-glow-3);
+  transition: background-color 0.5s ease;
+}
+
+.theme-mascot-card {
+  border-color: var(--mascot-card-border);
+  transition: border-color 0.5s ease;
+}
+
+/* Card Accent Lines & Status Colors with Dynamic Theme Adaptation */
+.card-accent-done {
+  background-image: linear-gradient(to right, #34d399, #2dd4bf, #38bdf8);
+  transition: background-image 0.5s ease;
+}
+html[data-theme="sunset"] .card-accent-done {
+  background-image: linear-gradient(to right, #10b981, #f59e0b, #fb923c);
+}
+
+.card-accent-in-progress {
+  background-image: linear-gradient(to right, #38bdf8, #60a5fa, #6366f1);
+  transition: background-image 0.5s ease;
+}
+html[data-theme="sunset"] .card-accent-in-progress {
+  background-image: linear-gradient(to right, #fb923c, #f43f5e, #ec4899);
+}
+
+.card-accent-todo {
+  background-image: linear-gradient(to right, #818cf8, #c084fc, #f472b6);
+  transition: background-image 0.5s ease;
+}
+html[data-theme="sunset"] .card-accent-todo {
+  background-image: linear-gradient(to right, #c084fc, #f43f5e, #fb923c);
+}
+
+/* Dynamic Sprint Progress Bar */
+.sprint-progress-bar {
+  background-image: linear-gradient(to right, #38bdf8, #6366f1, #10b981);
+  transition: background-image 0.5s ease;
+}
+html[data-theme="sunset"] .sprint-progress-bar {
+  background-image: linear-gradient(to right, #fb923c, #f43f5e, #fbbf24);
+}
+
+/* Premium Frosted Glass Card */
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px -5px rgba(100, 116, 139, 0.1), 0 4px 6px -2px rgba(100, 116, 139, 0.04);
+  transition: all 0.3s ease;
+}
+
+.frosted-glass:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 18px 35px -5px rgba(14, 165, 233, 0.16), 0 8px 10px -4px rgba(99, 102, 241, 0.08);
+}
+
+html[data-theme="sunset"] .frosted-glass:hover {
+  border-color: rgba(251, 146, 60, 0.5);
+  box-shadow: 0 18px 35px -5px rgba(251, 146, 60, 0.18), 0 8px 10px -4px rgba(244, 63, 94, 0.1);
+}
+
+/* Micro Animations */
+@keyframes cute-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes soft-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3), 0 0 40px rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.5), 0 0 60px rgba(244, 114, 182, 0.3);
+  }
+}
+
+.animate-cute-float {
+  animation: cute-float 4.5s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: soft-pulse-glow 4s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.7);
 }

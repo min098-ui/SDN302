@@ -9,9 +9,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TaskSync – Task & Team Management",
+  title: "TaskSync – Joyful & Professional Task Management",
   description:
-    "Task & Team Management application built with Next.js App Router, Prisma ORM, and Supabase PostgreSQL for SDN302 Assignment 1.",
+    "Task & Team Management application built with Next.js App Router, Prisma ORM, and Supabase PostgreSQL. Featuring a magical Snow Fox mascot and streamlined productivity workflow.",
+  icons: {
+    icon: "/mascot-fox.png",
+    apple: "/mascot-fox.png",
+  },
 };
 
 export default function RootLayout({
@@ -20,11 +24,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.className} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body
-        className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100"
+        className={`${inter.className} min-h-full flex flex-col luminous-bg text-slate-800 antialiased selection:bg-cyan-500 selection:text-white transition-colors duration-300`}
         suppressHydrationWarning
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try {
+              document.documentElement.classList.remove('dark');
+              localStorage.removeItem('theme');
+              var t = localStorage.getItem('color-theme') || 'ocean';
+              document.documentElement.setAttribute('data-theme', t);
+            } catch(e) {}`,
+          }}
+        />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
