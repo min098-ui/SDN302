@@ -24,9 +24,11 @@ import TaskListView from "@/components/TaskListView";
 import TaskModal from "@/components/TaskModal";
 import Toast, { ToastMessage } from "@/components/Toast";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import { useLanguage } from "@/lib/languageContext";
 import { Task, TaskFormData, TaskStatus, TaskPriority } from "@/lib/types";
 
 export default function HomePage() {
+  const { t } = useLanguage();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,13 +123,13 @@ export default function HomePage() {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         const msg = errorData.error || "Failed to update task";
-        addToast("error", "Update Error", msg);
+        addToast("error", t("toastErrorUpdate"), msg);
         throw new Error(msg);
       }
 
       const updated = await res.json();
       setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
-      addToast("success", "Task Updated!", `Changes saved for "${updated.title}".`);
+      addToast("success", t("toastUpdatedTitle"), `${t("toastUpdatedDesc")} "${updated.title}".`);
     } else {
       const res = await fetch("/api/tasks", {
         method: "POST",
@@ -138,7 +140,7 @@ export default function HomePage() {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         const msg = errorData.error || "Failed to create task";
-        addToast("error", "Creation Error", msg);
+        addToast("error", t("toastErrorCreate"), msg);
         throw new Error(msg);
       }
 
@@ -156,7 +158,7 @@ export default function HomePage() {
         setSearchQuery("");
       }
 
-      addToast("success", "Task Created!", `"${created.title}" has been added to the board.`);
+      addToast("success", t("toastCreatedTitle"), `"${created.title}" ${t("toastCreatedDesc")}`);
     }
   };
 
@@ -183,11 +185,11 @@ export default function HomePage() {
       }
 
       setTasks((prev) => prev.filter((t) => t.id !== deletingTask.id));
-      addToast("success", "Task Deleted!", `"${deletingTask.title}" was removed successfully.`);
+      addToast("success", t("toastDeletedTitle"), `"${deletingTask.title}" ${t("toastDeletedDesc")}`);
       setDeletingTask(null);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to delete task";
-      addToast("error", "Delete Error", msg);
+      addToast("error", t("toastErrorDelete"), msg);
     } finally {
       setIsDeleting(false);
     }
@@ -203,7 +205,7 @@ export default function HomePage() {
     const newStatus = nextStatus[task.status];
 
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)));
-    addToast("info", "Status Changed", `"${task.title}" ➔ ${newStatus}`);
+    addToast("info", t("toastStatusTitle"), `"${task.title}" ➔ ${newStatus}`);
 
     try {
       const res = await fetch(`/api/tasks/${task.id}`, {
@@ -214,11 +216,11 @@ export default function HomePage() {
 
       if (!res.ok) {
         fetchTasks();
-        addToast("error", "Sync Error", "Failed to update status in the database");
+        addToast("error", t("toastErrorSync"), "Failed to update status in the database");
       }
     } catch {
       fetchTasks();
-      addToast("error", "Network Error", "Please check your network connection");
+      addToast("error", t("toastErrorNetwork"), t("toastErrorNetworkDesc"));
     }
   };
 
@@ -297,22 +299,16 @@ export default function HomePage() {
             {/* Colorful Pill Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full theme-accent-badge border text-xs font-bold uppercase tracking-wider backdrop-blur-sm shadow-2xs">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Enterprise Workspace &bull; Active Sprint</span>
+              <span>{t("badgeSubtitle")}</span>
             </div>
 
             {/* Glowing Gradient Title */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-              Manage Tasks with <br />
-              <span className="theme-gradient-text">
-                Vibrant Clarity &amp; Ease
-              </span>
+              {t("heroTitle")}
             </h1>
 
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-              Track deliverables, synchronize workflows in real-time, and accomplish your milestones.
-              Built on <strong className="text-sky-700 font-semibold">Next.js 16</strong>,{" "}
-              <strong className="text-indigo-700 font-semibold">Prisma ORM</strong> &amp;{" "}
-              <strong className="text-emerald-700 font-semibold">Supabase</strong>.
+              {t("heroDesc")}
             </p>
 
             {/* Action Buttons */}
@@ -322,15 +318,15 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl theme-gradient-btn hover:scale-105 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-lg transition-all"
               >
                 <Plus className="w-4 h-4 stroke-[3]" />
-                <span>Create New Task</span>
+                <span>{t("btnNewTask")}</span>
               </button>
               <button
                 onClick={fetchTasks}
                 className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl border border-slate-200/80 bg-white/90 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold backdrop-blur-sm transition-all shadow-xs hover:border-slate-300"
-                title="Refresh Workspace Data"
+                title="Refresh Board"
               >
                 <RefreshCw className={`w-4 h-4 text-sky-600 ${loading ? "animate-spin" : ""}`} />
-                <span>Refresh Board</span>
+                <span>{t("filterStatusAll") === "All" ? "Refresh Board" : "Làm mới bảng"}</span>
               </button>
             </div>
           </div>
@@ -395,7 +391,7 @@ export default function HomePage() {
         <div className="relative overflow-hidden rounded-2xl p-5 border border-indigo-200/80 bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-white/95 shadow-md shadow-indigo-500/5 hover:border-indigo-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-indigo-700 uppercase tracking-wider">
-              Total Tasks
+              {t("statTotal")}
             </span>
             <div className="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-700 border border-indigo-200 flex items-center justify-center group-hover:scale-110 transition-transform">
               <ListTodo className="w-4 h-4" />
@@ -409,7 +405,7 @@ export default function HomePage() {
         <div className="relative overflow-hidden rounded-2xl p-5 border border-amber-200/80 bg-gradient-to-br from-amber-50/90 via-orange-50/50 to-white/95 shadow-md shadow-amber-500/5 hover:border-amber-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
-              To Do
+              {t("statTodo")}
             </span>
             <div className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-800 border border-amber-200 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Clock className="w-4 h-4" />
@@ -423,7 +419,7 @@ export default function HomePage() {
         <div className="relative overflow-hidden rounded-2xl p-5 border border-sky-200/80 bg-gradient-to-br from-sky-50/90 via-cyan-50/50 to-white/95 shadow-md shadow-sky-500/5 hover:border-sky-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-sky-700 uppercase tracking-wider">
-              In Progress
+              {t("statInProgress")}
             </span>
             <div className="w-9 h-9 rounded-xl bg-sky-500/15 text-sky-700 border border-sky-200 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Clock className="w-4 h-4 text-sky-600 animate-spin" style={{ animationDuration: "8s" }} />
@@ -437,7 +433,7 @@ export default function HomePage() {
         <div className="relative overflow-hidden rounded-2xl p-5 border border-emerald-200/80 bg-gradient-to-br from-emerald-50/90 via-teal-50/50 to-white/95 shadow-md shadow-emerald-500/5 hover:border-emerald-400 hover:-translate-y-1 transition-all group backdrop-blur-md">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
-              Completed
+              {t("statDone")}
             </span>
             <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-700 border border-emerald-200 flex items-center justify-center group-hover:scale-110 transition-transform">
               <CheckCircle2 className="w-4 h-4" />
@@ -454,10 +450,10 @@ export default function HomePage() {
           {/* Status Tabs with Multi-Color Pill Highlight */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
             {[
-              { id: "ALL", label: "All Tasks", count: stats.total },
-              { id: "TODO", label: "To Do", count: stats.todo },
-              { id: "IN_PROGRESS", label: "In Progress", count: stats.inProgress },
-              { id: "DONE", label: "Done", count: stats.done },
+              { id: "ALL", label: t("filterStatusAll"), count: stats.total },
+              { id: "TODO", label: t("statTodo"), count: stats.todo },
+              { id: "IN_PROGRESS", label: t("statInProgress"), count: stats.inProgress },
+              { id: "DONE", label: t("statDone"), count: stats.done },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -488,7 +484,7 @@ export default function HomePage() {
             <div className="relative flex-1 sm:w-64 min-w-[200px]">
               <input
                 type="text"
-                placeholder="Search missions, notes..."
+                placeholder={t("searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-8 pr-7 py-2 rounded-xl border border-slate-200 bg-white/90 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 transition-all shadow-2xs"
@@ -511,10 +507,10 @@ export default function HomePage() {
                 onChange={(e) => setPriorityFilter(e.target.value)}
                 className="appearance-none pl-7 pr-7 py-2 rounded-xl border border-slate-200 bg-white/90 text-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-slate-300 cursor-pointer shadow-2xs"
               >
-                <option value="ALL">All Priorities</option>
-                <option value="HIGH">High Priority</option>
-                <option value="MEDIUM">Medium Priority</option>
-                <option value="LOW">Low Priority</option>
+                <option value="ALL">{t("filterPriorityAll")}</option>
+                <option value="HIGH">{t("priorityHigh")}</option>
+                <option value="MEDIUM">{t("priorityMedium")}</option>
+                <option value="LOW">{t("priorityLow")}</option>
               </select>
               <Filter className="w-3.5 h-3.5 absolute left-2.5 pointer-events-none" style={{ color: "var(--accent-color)" }} />
             </div>
@@ -526,11 +522,11 @@ export default function HomePage() {
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 className="appearance-none pl-7 pr-7 py-2 rounded-xl border border-slate-200 bg-white/90 text-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-slate-300 cursor-pointer shadow-2xs"
               >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="dueDate">Due Date</option>
-                <option value="priority">Priority</option>
-                <option value="title">Title (A-Z)</option>
+                <option value="newest">{t("sortByNewest")}</option>
+                <option value="oldest">{t("sortByOldest")}</option>
+                <option value="dueDate">{t("sortByDueDate")}</option>
+                <option value="priority">{t("sortByPriority")}</option>
+                <option value="title">{t("sortByTitle")}</option>
               </select>
               <ArrowUpDown className="w-3.5 h-3.5 absolute left-2.5 pointer-events-none" style={{ color: "var(--accent-color)" }} />
             </div>
@@ -631,13 +627,11 @@ export default function HomePage() {
 
             <h3 className="text-lg font-bold text-slate-800">
               {searchQuery || statusFilter !== "ALL" || priorityFilter !== "ALL"
-                ? "No matching tasks found"
-                : "Workspace is all clear"}
+                ? t("noTasksFound")
+                : t("noTasksFound")}
             </h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-5">
-              {searchQuery || statusFilter !== "ALL" || priorityFilter !== "ALL"
-                ? "Try clearing your search query or adjusting your filters to find what you're looking for."
-                : "No active tasks in this queue. Create your first task to jumpstart your workflow!"}
+              {t("noTasksDesc")}
             </p>
             {searchQuery || statusFilter !== "ALL" || priorityFilter !== "ALL" ? (
               <button
@@ -648,7 +642,7 @@ export default function HomePage() {
                 }}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors border border-slate-200"
               >
-                Clear all filters
+                {t("clearFilters")}
               </button>
             ) : (
               <button
@@ -656,7 +650,7 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl theme-gradient-btn hover:scale-105 active:scale-95 text-white text-xs font-bold shadow-md transition-all"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
-                <span>Create First Task</span>
+                <span>{t("createFirstTask")}</span>
               </button>
             )}
           </div>

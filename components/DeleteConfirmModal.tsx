@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 import { Task } from "@/lib/types";
+import { useLanguage } from "@/lib/languageContext";
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ export default function DeleteConfirmModal({
   onClose,
   onConfirm,
 }: DeleteConfirmModalProps) {
+  const { t } = useLanguage();
+
   if (!isOpen || !task) return null;
 
   return (
@@ -41,9 +44,9 @@ export default function DeleteConfirmModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-rose-900 flex items-center gap-2">
-                <span>Confirm Delete Task</span>
+                <span>{t("deleteTitle")}</span>
               </h3>
-              <p className="text-xs text-rose-600/80">This action cannot be undone</p>
+              <p className="text-xs text-rose-600/80">{t("deleteWarning")}</p>
             </div>
           </div>
           <button
@@ -61,12 +64,12 @@ export default function DeleteConfirmModal({
           <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-rose-50/70 border border-rose-200/60 mb-5">
             <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
             <div className="text-xs text-rose-800 leading-relaxed">
-              Are you sure you want to permanently delete this task from the database?
+              {t("deleteDesc")}
             </div>
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 mb-6">
-            <p className="text-xs text-slate-500 font-semibold mb-1">Task Title:</p>
+            <p className="text-xs text-slate-500 font-semibold mb-1">{t("deleteTaskLabel")}</p>
             <p className="text-sm font-bold text-slate-900 line-clamp-2">{task.title}</p>
             {task.description && (
               <p className="text-xs text-slate-600 line-clamp-2 mt-1 italic">
@@ -83,7 +86,7 @@ export default function DeleteConfirmModal({
               type="button"
               className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 active:scale-95 transition-all disabled:opacity-50"
             >
-              Cancel
+              {t("btnCancel")}
             </button>
             <button
               onClick={onConfirm}
@@ -92,7 +95,7 @@ export default function DeleteConfirmModal({
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 shadow-md shadow-rose-500/25 active:scale-95 transition-all disabled:opacity-50"
             >
               <Trash2 className="w-4 h-4" />
-              {isDeleting ? "Deleting..." : "Delete Task"}
+              {isDeleting ? t("btnDeleting") : t("btnDeleteNow")}
             </button>
           </div>
         </div>

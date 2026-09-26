@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Palette } from "lucide-react";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function ThemePaletteToggle() {
+  const { t, language } = useLanguage();
   const [theme, setTheme] = useState<"ocean" | "sunset">("ocean");
   const [mounted, setMounted] = useState(false);
 
@@ -33,15 +35,20 @@ export default function ThemePaletteToggle() {
     );
   }
 
+  const tooltipText =
+    language === "vi"
+      ? theme === "ocean"
+        ? "Đang dùng: Xanh Biển Cực Quang • Bấm để đổi sang Hoàng Hôn San Hô"
+        : "Đang dùng: Hoàng Hôn San Hô • Bấm để đổi sang Xanh Biển Cực Quang"
+      : theme === "ocean"
+      ? "Active: Ocean Sky • Click to switch to Sunset Coral"
+      : "Active: Sunset Coral • Click to switch to Ocean Sky";
+
   return (
     <button
       onClick={toggleTheme}
       type="button"
-      title={
-        theme === "ocean"
-          ? "Active Theme: Ocean Sky • Click to switch to Sunset Coral"
-          : "Active Theme: Sunset Coral • Click to switch to Ocean Sky"
-      }
+      title={tooltipText}
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs border ${
         theme === "ocean"
           ? "bg-white/90 hover:bg-sky-50 text-sky-800 border-sky-200/90 shadow-sky-500/10"
@@ -69,7 +76,7 @@ export default function ThemePaletteToggle() {
       </span>
 
       <span className="text-[11px] font-bold">
-        {theme === "ocean" ? "Ocean Theme" : "Sunset Theme"}
+        {theme === "ocean" ? t("oceanTheme") : t("sunsetTheme")}
       </span>
     </button>
   );

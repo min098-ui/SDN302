@@ -1,13 +1,16 @@
 import { Database, Cloud, Layers, Terminal } from "lucide-react";
 import Logo from "@/components/Logo";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="mt-auto border-t border-slate-200/80 bg-white/75 backdrop-blur-md transition-colors py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-            <Logo size="md" subtitle="Smart, Joyful & Effortless Productivity" />
+            <Logo size="md" subtitle={t("footerSubtitle")} />
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs text-slate-600">
