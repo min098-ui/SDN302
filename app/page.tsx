@@ -22,12 +22,24 @@ import {
 import TaskCard from "@/components/TaskCard";
 import TaskListView from "@/components/TaskListView";
 import TaskModal from "@/components/TaskModal";
+import Toast, { ToastMessage } from "@/components/Toast";
+import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import { Task, TaskFormData, TaskStatus, TaskPriority } from "@/lib/types";
 
 export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Toast Notifications
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const addToast = (type: "success" | "error" | "info", title: string, description?: string) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, type, title, description }]);
+  };
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   // Filters & Search
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
@@ -39,6 +51,10 @@ export default function HomePage() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  // Delete Confirm Modal State
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Fetch tasks
   const fetchTasks = async () => {
@@ -104,11 +120,14 @@ export default function HomePage() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to update task");
+        const msg = errorData.error || "Không thể cập nhật nhiệm vụ";
+        addToast("error", "Lỗi cập nhật", msg);
+        throw new Error(msg);
       }
 
       const updated = await res.json();
       setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+      addToast("success", "Cập nhật thành công!", `Đã lưu thay đổi cho "${updated.title}".`);
     } else {
       const res = await fetch("/api/tasks", {
         method: "POST",
@@ -118,32 +137,59 @@ export default function HomePage() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to create task");
+        const msg = errorData.error || "Không thể tạo nhiệm vụ";
+        addToast("error", "Lỗi tạo mới", msg);
+        throw new Error(msg);
       }
 
       const created = await res.json();
       setTasks((prev) => [created, ...prev]);
+
+      // If user had an active filter that would hide this newly created task, auto reset filter
+      if (statusFilter !== "ALL" && statusFilter !== created.status) {
+        setStatusFilter("ALL");
+      }
+      if (priorityFilter !== "ALL" && priorityFilter !== created.priority) {
+        setPriorityFilter("ALL");
+      }
+      if (searchQuery.trim() !== "") {
+        setSearchQuery("");
+      }
+
+      addToast("success", "Tạo nhiệm vụ thành công!", `"${created.title}" đã được thêm vào danh sách.`);
     }
   };
 
-  // Handle Delete
-  const handleDeleteTask = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) {
-      return;
+  // Open Delete Confirmation Modal
+  const handleDeleteTask = (id: string) => {
+    const taskToDelete = tasks.find((t) => t.id === id);
+    if (taskToDelete) {
+      setDeletingTask(taskToDelete);
     }
+  };
 
+  // Confirm Delete
+  const handleConfirmDelete = async () => {
+    if (!deletingTask) return;
     try {
-      const res = await fetch(`/api/tasks/${id}`, {
+      setIsDeleting(true);
+      const res = await fetch(`/api/tasks/${deletingTask.id}`, {
         method: "DELETE",
       });
 
       if (!res.ok) {
-        throw new Error("Failed to delete task");
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Lỗi khi xóa nhiệm vụ");
       }
 
-      setTasks((prev) => prev.filter((t) => t.id !== id));
+      setTasks((prev) => prev.filter((t) => t.id !== deletingTask.id));
+      addToast("success", "Đã xóa nhiệm vụ!", `Nhiệm vụ "${deletingTask.title}" đã được xóa.`);
+      setDeletingTask(null);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Error deleting task");
+      const msg = err instanceof Error ? err.message : "Lỗi khi xóa nhiệm vụ";
+      addToast("error", "Không thể xóa", msg);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -157,6 +203,7 @@ export default function HomePage() {
     const newStatus = nextStatus[task.status];
 
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)));
+    addToast("info", "Đã cập nhật trạng thái", `"${task.title}" ➔ ${newStatus}`);
 
     try {
       const res = await fetch(`/api/tasks/${task.id}`, {
@@ -167,9 +214,11 @@ export default function HomePage() {
 
       if (!res.ok) {
         fetchTasks();
+        addToast("error", "Lỗi đồng bộ", "Không thể lưu trạng thái vào cơ sở dữ liệu");
       }
     } catch {
       fetchTasks();
+      addToast("error", "Lỗi kết nối", "Vui lòng kiểm tra lại đường truyền");
     }
   };
 
@@ -622,6 +671,18 @@ export default function HomePage() {
         onSubmit={handleFormSubmit}
         initialTask={editingTask}
       />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!deletingTask}
+        task={deletingTask}
+        isDeleting={isDeleting}
+        onClose={() => setDeletingTask(null)}
+        onConfirm={handleConfirmDelete}
+      />
+
+      {/* Floating Animated Toast Notifications */}
+      <Toast toasts={toasts} onDismiss={removeToast} />
     </div>
   );
 }
