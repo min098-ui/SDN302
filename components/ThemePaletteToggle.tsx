@@ -39,8 +39,8 @@ export default function ThemePaletteToggle() {
       type="button"
       title={
         theme === "ocean"
-          ? "Đang dùng: Xanh Biển Cực Quang • Bấm để đổi sang Hoàng Hôn San Hô"
-          : "Đang dùng: Hoàng Hôn San Hô • Bấm để đổi sang Xanh Biển Cực Quang"
+          ? "Active Theme: Ocean Sky • Click to switch to Sunset Coral"
+          : "Active Theme: Sunset Coral • Click to switch to Ocean Sky"
       }
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs border ${
         theme === "ocean"

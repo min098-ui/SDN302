@@ -120,14 +120,14 @@ export default function HomePage() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        const msg = errorData.error || "Không thể cập nhật nhiệm vụ";
-        addToast("error", "Lỗi cập nhật", msg);
+        const msg = errorData.error || "Failed to update task";
+        addToast("error", "Update Error", msg);
         throw new Error(msg);
       }
 
       const updated = await res.json();
       setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
-      addToast("success", "Cập nhật thành công!", `Đã lưu thay đổi cho "${updated.title}".`);
+      addToast("success", "Task Updated!", `Changes saved for "${updated.title}".`);
     } else {
       const res = await fetch("/api/tasks", {
         method: "POST",
@@ -137,8 +137,8 @@ export default function HomePage() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        const msg = errorData.error || "Không thể tạo nhiệm vụ";
-        addToast("error", "Lỗi tạo mới", msg);
+        const msg = errorData.error || "Failed to create task";
+        addToast("error", "Creation Error", msg);
         throw new Error(msg);
       }
 
@@ -156,7 +156,7 @@ export default function HomePage() {
         setSearchQuery("");
       }
 
-      addToast("success", "Tạo nhiệm vụ thành công!", `"${created.title}" đã được thêm vào danh sách.`);
+      addToast("success", "Task Created!", `"${created.title}" has been added to the board.`);
     }
   };
 
@@ -179,15 +179,15 @@ export default function HomePage() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Lỗi khi xóa nhiệm vụ");
+        throw new Error(errorData.error || "Failed to delete task");
       }
 
       setTasks((prev) => prev.filter((t) => t.id !== deletingTask.id));
-      addToast("success", "Đã xóa nhiệm vụ!", `Nhiệm vụ "${deletingTask.title}" đã được xóa.`);
+      addToast("success", "Task Deleted!", `"${deletingTask.title}" was removed successfully.`);
       setDeletingTask(null);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Lỗi khi xóa nhiệm vụ";
-      addToast("error", "Không thể xóa", msg);
+      const msg = err instanceof Error ? err.message : "Failed to delete task";
+      addToast("error", "Delete Error", msg);
     } finally {
       setIsDeleting(false);
     }
@@ -203,7 +203,7 @@ export default function HomePage() {
     const newStatus = nextStatus[task.status];
 
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)));
-    addToast("info", "Đã cập nhật trạng thái", `"${task.title}" ➔ ${newStatus}`);
+    addToast("info", "Status Changed", `"${task.title}" ➔ ${newStatus}`);
 
     try {
       const res = await fetch(`/api/tasks/${task.id}`, {
@@ -214,11 +214,11 @@ export default function HomePage() {
 
       if (!res.ok) {
         fetchTasks();
-        addToast("error", "Lỗi đồng bộ", "Không thể lưu trạng thái vào cơ sở dữ liệu");
+        addToast("error", "Sync Error", "Failed to update status in the database");
       }
     } catch {
       fetchTasks();
-      addToast("error", "Lỗi kết nối", "Vui lòng kiểm tra lại đường truyền");
+      addToast("error", "Network Error", "Please check your network connection");
     }
   };
 
