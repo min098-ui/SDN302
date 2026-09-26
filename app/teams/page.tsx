@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Users, ArrowLeft, ShieldCheck, UserCheck, FolderKanban, Sparkles } from "lucide-react";
 
 export default function TeamsPage() {
@@ -9,7 +8,8 @@ export default function TeamsPage() {
       <div className="text-center space-y-4">
         {/* Cute Snow Fox Mascot Avatar */}
         <div className="w-20 h-20 mx-auto flex items-center justify-center">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/mascot-fox.png"
             alt="Snow Fox Teams"
             width={76}

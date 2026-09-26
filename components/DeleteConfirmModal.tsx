@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 import { Task } from "@/lib/types";
 import { useLanguage } from "@/lib/languageContext";
@@ -34,12 +33,13 @@ export default function DeleteConfirmModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-rose-100 bg-rose-50/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 flex items-center justify-center">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/mascot-fox.png"
                 alt="Snow Fox Mascot"
                 width={38}
                 height={38}
-                className="object-contain drop-shadow-xs"
+                className="object-contain drop-shadow-xs mascot-fox-img"
               />
             </div>
             <div>

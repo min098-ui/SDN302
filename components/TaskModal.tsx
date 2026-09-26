@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { X, Calendar, AlertCircle, Loader2 } from "lucide-react";
 import { Task, TaskFormData, TaskPriority, TaskStatus } from "@/lib/types";
 import { useLanguage } from "@/lib/languageContext";
@@ -69,7 +68,8 @@ export default function TaskModal({ isOpen, onClose, onSubmit, initialTask }: Ta
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 theme-modal-header">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 flex items-center justify-center">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/mascot-fox.png"
                 alt="Snow Fox Mascot"
                 width={40}

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
@@ -8,7 +7,8 @@ export default function LoginPage() {
       <div className="text-center space-y-3">
         {/* Cute Snow Fox Mascot Avatar */}
         <div className="w-20 h-20 mx-auto flex items-center justify-center">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/mascot-fox.png"
             alt="Snow Fox Mascot"
             width={76}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Image from "next/image";
 import {
   Plus,
   Search,
@@ -337,7 +336,8 @@ export default function HomePage() {
             <div className="relative group p-4 rounded-3xl bg-white/90 border theme-mascot-card backdrop-blur-xl shadow-lg flex items-center gap-4 min-w-[270px]">
               <div className="w-16 h-16 relative flex items-center justify-center shrink-0">
                 <div className="absolute inset-0 rounded-full blur-md group-hover:scale-110 transition-transform theme-halo-1" />
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src="/mascot-fox.png"
                   alt="Snow Fox Mascot"
                   width={62}
@@ -616,12 +616,13 @@ export default function HomePage() {
           /* Polished Empty State with Snow Fox Mascot */
           <div className="text-center py-16 px-4 rounded-3xl border border-dashed border-sky-300 bg-white/70 backdrop-blur-md shadow-xs">
             <div className="w-24 h-24 mx-auto mb-4 relative animate-cute-float">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/mascot-fox.png"
                 alt="Snow Fox Mascot"
                 width={96}
                 height={96}
-                className="object-contain drop-shadow-md"
+                className="object-contain drop-shadow-md mascot-fox-img"
               />
             </div>
 

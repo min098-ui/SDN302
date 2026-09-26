@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
@@ -40,7 +39,8 @@ export default function Logo({
         <div
           className={`${currentSize.box} relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/mascot-fox.png"
             alt="Snow Fox Mascot Logo"
             width={currentSize.img}
@@ -48,7 +48,6 @@ export default function Logo({
             className={`object-contain drop-shadow-md mascot-fox-img transition-transform duration-300 ${
               animate ? "animate-cute-float" : ""
             }`}
-            priority
           />
         </div>
 
