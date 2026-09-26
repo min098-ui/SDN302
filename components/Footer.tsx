@@ -1,3 +1,5 @@
+"use client";
+
 import { Database, Cloud, Layers, Terminal } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useLanguage } from "@/lib/languageContext";
