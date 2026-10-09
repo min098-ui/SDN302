@@ -1,4 +1,4 @@
-# TaskSync – Task & Team Management Application (Assignment 1)
+# AuraSync – Task & Team Management Application (Assignment 1)
 
 > **Course**: SDN302 – Web Development with Next.js & Cloud Databases  
 > **Student Assignment**: Assignment 1 – Project Setup, Prisma & Deployment  
@@ -10,7 +10,7 @@
 
 ## 📌 Project Overview
 
-**TaskSync** is a modern task and team management web application built with **Next.js App Router**, **TypeScript**, **Tailwind CSS**, and **Prisma ORM** connected to a cloud **PostgreSQL database hosted on Supabase**.
+**AuraSync** is a modern task and team management web application built with **Next.js App Router**, **TypeScript**, **Tailwind CSS**, and **Prisma ORM** connected to a cloud **PostgreSQL database hosted on Supabase**.
 
 In this foundational phase (Assignment 1), the application provides:
 - **Full Public CRUD** for tasks without requiring authentication.

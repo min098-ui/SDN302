@@ -1,36 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, Sparkles } from "lucide-react";
 import AnimatedPlanet from "@/components/AnimatedPlanet";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
       });
 
-      if (res?.error) {
-        toast.error("Invalid credentials");
+      if (res.ok) {
+        toast.success("Registration successful! Please login.");
+        router.push("/login");
       } else {
-        toast.success("Logged in successfully");
-        router.push("/dashboard");
-        router.refresh();
+        const data = await res.json();
+        toast.error(data.error || "Registration failed");
       }
     } catch (error) {
       toast.error("Something went wrong");
@@ -42,6 +49,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-[90vh] flex items-stretch bg-slate-50/50 p-4 lg:p-8">
       <div className="w-full max-w-6xl mx-auto flex rounded-[2.5rem] bg-white shadow-2xl overflow-hidden border border-slate-200/60">
+        
         {/* Left Side: Brand Panel */}
         <div className="hidden lg:flex w-5/12 bg-slate-900 relative p-12 flex-col justify-center overflow-hidden">
           {/* Decorative Orbs */}
@@ -51,11 +59,12 @@ export default function LoginPage() {
           {/* Content */}
           <div className="relative z-10 space-y-2 flex flex-col items-center text-center">
             <h1 className="text-4xl xl:text-5xl font-black text-white leading-[1.1] tracking-tight mb-4">
-              Welcome to{" "}
+              Create an{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary-300">
-                AuraSync
+                Account
               </span>
             </h1>
+            
             <AnimatedPlanet />
           </div>
         </div>
@@ -70,13 +79,28 @@ export default function LoginPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/mascot-bunny-nobg.png" alt="Snow Bunny" width={56} height={56} className="mascot-bunny-img object-contain" />
               </div>
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight">Sign In</h2>
+              <h2 className="text-3xl font-black text-slate-900 tracking-tight">Create an Account</h2>
               <p className="text-sm text-slate-500 font-medium max-w-sm mx-auto">
-                Enter your details to access your workspace.
+                Start collaborating with your teams and organizing tasks today.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5 lg:mt-0">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  autoComplete="name"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400"
+                  placeholder="John Doe"
+                />
+              </div>
+              
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
                 <input
@@ -93,18 +117,35 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex justify-between items-center ml-1">
+                <div className="flex items-center justify-between ml-1">
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Password</label>
-                  <Link href="#" className="text-[11px] font-bold text-primary-500 hover:text-primary-600">Forgot password?</Link>
+                  <span className="text-[10px] font-medium text-slate-400">Min. 6 characters</span>
                 </div>
                 <input
                   type="password"
                   name="password"
                   id="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
+                  minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Confirm Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  id="confirmPassword"
+                  autoComplete="new-password"
+                  required
+                  minLength={6}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-5 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all text-sm font-medium text-slate-900 placeholder:text-slate-400"
                   placeholder="••••••••"
                 />
@@ -119,7 +160,7 @@ export default function LoginPage() {
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   <>
-                    Sign In <ArrowRight className="w-4 h-4" />
+                    Create Account <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
@@ -127,14 +168,15 @@ export default function LoginPage() {
 
             <div className="text-center pt-4">
               <p className="text-sm font-medium text-slate-500">
-                Don't have an account?{" "}
-                <Link href="/register" className="text-primary-600 font-bold hover:text-primary-500 transition-colors">
-                  Create account
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary-600 font-bold hover:text-primary-500 transition-colors">
+                  Sign in
                 </Link>
               </p>
             </div>
           </div>
         </div>
+        
       </div>
     </div>
   );

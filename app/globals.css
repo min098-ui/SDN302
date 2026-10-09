@@ -35,19 +35,19 @@ body {
 */
 :root,
 html[data-theme="ocean"] {
-  --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #4f46e5 100%);
-  --primary-gradient-hover: linear-gradient(135deg, #38bdf8 0%, #3b82f6 50%, #6366f1 100%);
-  --brand-text-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #9333ea 100%);
-  --accent-color: #0284c7;
+  --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 50%, #06b6d4 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 50%, #22d3ee 100%);
+  --brand-text-gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 50%, #06b6d4 100%);
+  --accent-color: #0ea5e9;
   --accent-bg-subtle: rgba(14, 165, 233, 0.12);
   --accent-border: rgba(56, 189, 248, 0.45);
-  --halo-glow-1: rgba(56, 189, 248, 0.25);
-  --halo-glow-2: rgba(168, 85, 247, 0.22);
-  --halo-glow-3: rgba(244, 114, 182, 0.18);
+  --halo-glow-1: rgba(56, 189, 248, 0.35);
+  --halo-glow-2: rgba(6, 182, 212, 0.35);
+  --halo-glow-3: rgba(45, 212, 191, 0.25);
   --mascot-card-border: rgba(186, 230, 253, 0.85);
   --active-tab-shadow: 0 4px 14px 0 rgba(14, 165, 233, 0.35);
   --primary-btn-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3);
-  --focus-ring: #0284c7;
+  --focus-ring: #0ea5e9;
 }
 
 html[data-theme="sunset"] {
@@ -72,10 +72,10 @@ html[data-theme="ocean"] body {
   background-color: #f1f5f9;
   background-image:
     radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.30) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.25) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(244, 114, 182, 0.18) 0px, transparent 55%),
-    radial-gradient(at 0% 100%, rgba(45, 212, 191, 0.22) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.25) 0px, transparent 50%);
+    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.25) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(45, 212, 191, 0.18) 0px, transparent 55%),
+    radial-gradient(at 0% 100%, rgba(14, 165, 233, 0.22) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.25) 0px, transparent 50%);
   background-attachment: fixed;
   transition: background-color 0.5s ease-in-out;
 }
@@ -115,13 +115,11 @@ html[data-theme="sunset"] body {
 }
 
 /* Mascot Fox & Logo Color Synchronization */
-.mascot-fox-img {
-  width: auto;
-  height: auto;
+.mascot-bunny-img {
   transition: filter 0.5s ease-in-out;
 }
 
-html[data-theme="sunset"] .mascot-fox-img {
+html[data-theme="sunset"] .mascot-bunny-img {
   filter: hue-rotate(185deg) saturate(1.18);
 }
 
@@ -167,7 +165,7 @@ html[data-theme="sunset"] .mascot-sparkle-badge {
 }
 
 .theme-modal-header {
-  background-image: linear-gradient(to right, rgba(224, 242, 254, 0.6), rgba(238, 242, 255, 0.4), rgba(243, 232, 255, 0.4));
+  background-image: linear-gradient(to right, rgba(224, 242, 254, 0.6), rgba(207, 250, 254, 0.4), rgba(224, 242, 254, 0.4));
   transition: background-image 0.5s ease;
 }
 
@@ -247,10 +245,10 @@ html[data-theme="sunset"] .frosted-glass:hover {
 
 @keyframes soft-pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3), 0 0 40px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3), 0 0 40px rgba(6, 182, 212, 0.2);
   }
   50% {
-    box-shadow: 0 0 30px rgba(56, 189, 248, 0.5), 0 0 60px rgba(244, 114, 182, 0.3);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.5), 0 0 60px rgba(14, 165, 233, 0.3);
   }
 }
 
@@ -276,4 +274,61 @@ html[data-theme="sunset"] .frosted-glass:hover {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(14, 165, 233, 0.7);
+}
+
+@theme inline {
+  --color-primary-50: var(--theme-c1-50);
+  --color-primary-100: var(--theme-c1-100);
+  --color-primary-200: var(--theme-c1-200);
+  --color-primary-300: var(--theme-c1-300);
+  --color-primary-400: var(--theme-c1-400);
+  --color-primary-500: var(--theme-c1-500);
+  --color-primary-600: var(--theme-c1-600);
+  --color-secondary-50: var(--theme-c2-50);
+  --color-secondary-100: var(--theme-c2-100);
+  --color-secondary-200: var(--theme-c2-200);
+  --color-secondary-300: var(--theme-c2-300);
+  --color-secondary-400: var(--theme-c2-400);
+  --color-secondary-500: var(--theme-c2-500);
+  --color-secondary-600: var(--theme-c2-600);
+  --color-secondary-700: var(--theme-c2-700);
+}
+
+:root,
+html[data-theme="ocean"] {
+  --theme-c1-50: #f0f9ff;
+  --theme-c1-100: #e0f2fe;
+  --theme-c1-200: #bae6fd;
+  --theme-c1-300: #7dd3fc;
+  --theme-c1-400: #38bdf8;
+  --theme-c1-500: #0ea5e9;
+  --theme-c1-600: #0284c7;
+  
+  --theme-c2-50: #ecfeff;
+  --theme-c2-100: #cffafe;
+  --theme-c2-200: #a5f3fc;
+  --theme-c2-300: #67e8f9;
+  --theme-c2-400: #22d3ee;
+  --theme-c2-500: #06b6d4;
+  --theme-c2-600: #0891b2;
+  --theme-c2-700: #0e7490;
+}
+
+html[data-theme="sunset"] {
+  --theme-c1-50: #fff1f2;
+  --theme-c1-100: #ffe4e6;
+  --theme-c1-200: #fecdd3;
+  --theme-c1-300: #fda4af;
+  --theme-c1-400: #fb7185;
+  --theme-c1-500: #f43f5e;
+  --theme-c1-600: #e11d48;
+  
+  --theme-c2-50: #fffbeb;
+  --theme-c2-100: #fef3c7;
+  --theme-c2-200: #fde68a;
+  --theme-c2-300: #fcd34d;
+  --theme-c2-400: #fbbf24;
+  --theme-c2-500: #f59e0b;
+  --theme-c2-600: #d97706;
+  --theme-c2-700: #b45309;
 }

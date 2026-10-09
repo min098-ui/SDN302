@@ -1,7 +1,7 @@
 "use client";
 
 import { Task } from "@/lib/types";
-import { Calendar, Edit3, Trash2, Clock, CheckCircle2, Circle } from "lucide-react";
+import { Calendar, Edit3, Trash2, Check } from "lucide-react";
 
 interface TaskListViewProps {
   tasks: Task[];
@@ -20,24 +20,18 @@ export default function TaskListView({
     switch (status) {
       case "DONE":
         return {
-          label: "Done",
-          dotColor: "bg-emerald-500",
-          icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
-          classes: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          label: "DONE",
+          classes: "bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold",
         };
       case "IN_PROGRESS":
         return {
-          label: "In Progress",
-          dotColor: "bg-cyan-500 animate-pulse",
-          icon: <Clock className="w-4 h-4 text-sky-600" />,
-          classes: "bg-sky-50 text-sky-700 border-sky-200",
+          label: "IN PROGRESS",
+          classes: "bg-secondary-50 text-secondary-700 border border-secondary-200 font-bold",
         };
       default:
         return {
-          label: "To Do",
-          dotColor: "bg-indigo-500",
-          icon: <Circle className="w-4 h-4 text-indigo-500" />,
-          classes: "bg-indigo-50 text-indigo-700 border-indigo-200",
+          label: "TO DO",
+          classes: "bg-slate-50 text-slate-600 border border-slate-200 font-bold",
         };
     }
   };
@@ -46,140 +40,134 @@ export default function TaskListView({
     switch (priority) {
       case "HIGH":
         return {
-          label: "High Priority",
-          classes: "bg-rose-50 text-rose-700 border-rose-200 font-bold",
+          label: "HIGH",
+          classes: "bg-gradient-to-r from-rose-50 to-pink-50 text-rose-700 border border-rose-200 font-bold",
         };
       case "MEDIUM":
         return {
-          label: "Medium",
-          classes: "bg-amber-50 text-amber-800 border-amber-200 font-semibold",
+          label: "MEDIUM",
+          classes: "bg-gradient-to-r from-amber-50 to-orange-50 text-amber-800 border border-amber-200 font-bold",
         };
       default:
         return {
-          label: "Low",
-          classes: "bg-slate-50 text-slate-600 border-slate-200 font-medium",
+          label: "LOW",
+          classes: "bg-slate-50 text-slate-600 border border-slate-200 font-bold",
         };
     }
   };
 
   return (
-    <div className="bg-white/85 backdrop-blur-xl border border-white/80 rounded-2xl overflow-hidden shadow-lg">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr className="border-b border-slate-200/80 bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
-              <th className="py-4 px-4 w-12 text-center">Status</th>
-              <th className="py-4 px-4 min-w-[260px]">Task Title &amp; Description</th>
-              <th className="py-4 px-4 w-32">Priority</th>
-              <th className="py-4 px-4 w-36">Due Date</th>
-              <th className="py-4 px-4 w-28 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {tasks.map((task) => {
-              const statusBadge = getStatusBadge(task.status);
-              const priorityBadge = getPriorityBadge(task.priority);
-              const isOverdue =
-                task.dueDate &&
-                task.status !== "DONE" &&
-                new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+    <div className="space-y-4">
+      {tasks.map((task) => {
+        const statusBadge = getStatusBadge(task.status);
+        const priorityBadge = getPriorityBadge(task.priority);
+        const isOverdue =
+          task.dueDate &&
+          task.status !== "DONE" &&
+          new Date(task.dueDate) < new Date(new Date().setHours(0, 0, 0, 0));
+        const isDone = task.status === "DONE";
 
-              return (
-                <tr
-                  key={task.id}
-                  className="group hover:bg-sky-50/40 transition-colors"
-                >
-                  {/* Status Toggle Button */}
-                  <td className="py-3.5 px-4 text-center">
-                    <button
-                      onClick={() => onToggleStatus(task)}
-                      title={`Click to advance: ${task.status}`}
-                      className="p-1.5 rounded-lg hover:bg-slate-100 transition-transform active:scale-90 inline-flex items-center justify-center"
+        return (
+          <div
+            key={task.id}
+            className={`bg-white rounded-xl border p-4 transition-colors ${
+              isDone ? "border-slate-200/60 opacity-75" : "border-slate-200 hover:border-slate-300"
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              {/* Checkbox */}
+              <button
+                onClick={() => onToggleStatus(task)}
+                className={`w-6 h-6 rounded-[6px] border flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors shadow-2xs ${
+                  isDone
+                    ? "bg-primary-500 border-primary-500 text-white"
+                    : "border-slate-300 hover:border-primary-400 bg-white"
+                }`}
+                title="Toggle status"
+              >
+                {isDone && <Check className="w-4 h-4" />}
+              </button>
+
+              {/* Main Content Area */}
+              <div className="flex-1 min-w-0">
+                {/* Top Row: Title, Status, Actions */}
+                <div className="flex items-start justify-between gap-4 mb-1.5">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h3
+                      className={`text-[17px] font-extrabold tracking-tight ${
+                        isDone ? "text-slate-400 line-through" : "text-slate-800"
+                      }`}
                     >
-                      {statusBadge.icon}
-                    </button>
-                  </td>
-
-                  {/* Title & Description */}
-                  <td className="py-3.5 px-4">
-                    <div className="flex flex-col">
-                      <span
-                        className={`font-bold text-sm transition-colors ${
-                          task.status === "DONE"
-                            ? "line-through text-slate-400"
-                            : "text-slate-900 group-hover:text-sky-600"
-                        }`}
-                      >
-                        {task.title}
-                      </span>
-                      {task.description && (
-                        <span className="text-slate-500 line-clamp-1 mt-0.5 text-xs">
-                          {task.description}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* Priority Badge */}
-                  <td className="py-3.5 px-4">
+                      {task.title}
+                    </h3>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border ${priorityBadge.classes}`}
+                      className={`text-[9px] uppercase px-2 py-0.5 rounded-md ${statusBadge.classes}`}
                     >
-                      {priorityBadge.label}
+                      {statusBadge.label}
                     </span>
-                  </td>
+                  </div>
 
-                  {/* Due Date */}
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-1.5 text-slate-600">
-                      <Calendar
-                        className={`w-3.5 h-3.5 ${isOverdue ? "text-rose-500" : "text-sky-500"}`}
-                      />
-                      {task.dueDate ? (
-                        <span
-                          suppressHydrationWarning
-                          className={`font-semibold ${
-                            isOverdue
-                              ? "text-rose-600"
-                              : "text-slate-700"
-                          }`}
-                        >
-                          {new Date(task.dueDate).toLocaleDateString()}
-                          {isOverdue && (
-                            <span className="ml-1 text-[10px] text-rose-500 font-bold">(Overdue)</span>
-                          )}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400 italic">No deadline</span>
-                      )}
-                    </div>
-                  </td>
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <button
+                      onClick={() => onEdit(task)}
+                      className="hover:text-slate-600 transition-colors p-1"
+                      title="Edit"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => onDelete(task.id)}
+                      className="hover:text-rose-600 transition-colors p-1"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
 
-                  {/* Actions */}
-                  <td className="py-3.5 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => onEdit(task)}
-                        className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors"
-                        title="Edit Task"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => onDelete(task.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                        title="Delete Task"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                {/* Middle Row: Priority */}
+                <div className="mb-2.5">
+                  <span
+                    className={`text-[10px] uppercase px-2 py-0.5 rounded-md ${priorityBadge.classes}`}
+                  >
+                    {priorityBadge.label}
+                  </span>
+                </div>
+
+                {/* Description */}
+                {task.description && (
+                  <p className="text-[13px] text-slate-600 mb-3.5 font-medium">{task.description}</p>
+                )}
+
+                {/* Footer */}
+                <div className="flex items-center gap-4 text-xs text-slate-500">
+                  <div
+                    className={`flex items-center gap-1.5 font-semibold ${
+                      isDone
+                        ? "text-slate-400"
+                        : isOverdue
+                        ? "text-rose-700"
+                        : "text-slate-700"
+                    }`}
+                  >
+                    <Calendar className="w-3.5 h-3.5 text-primary-500" />
+                    {task.dueDate ? (
+                      <span suppressHydrationWarning>
+                        Due {new Date(task.dueDate).toLocaleDateString()}
+                      </span>
+                    ) : (
+                      <span className="italic font-normal">No deadline</span>
+                    )}
+                  </div>
+                  <span suppressHydrationWarning className="font-medium text-slate-400">
+                    Created {new Date(task.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

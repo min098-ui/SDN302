@@ -25,7 +25,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Hero & Stats
     badgeSubtitle: "Smart & Joyful Workspace",
-    heroTitle: "Effortless Team & Task Management",
+    heroTitle: "Task Management",
     heroDesc:
       "A modern task management board connected to Supabase PostgreSQL with real-time status tracking, fast filters, and delightful pastel themes.",
     statTotal: "Total Tasks",
@@ -96,6 +96,45 @@ const translations: Record<Language, Record<string, string>> = {
     // Footer
     footerSubtitle: "Smart, Joyful & Effortless Productivity",
     footerCopy: "Task & Team Management App. Built for Assignment 1.",
+
+    // Teams Dashboard
+    cmdCenter: "Command Center",
+    welcomeBack: "Welcome back",
+    teamsHeroDesc: "Manage your workspaces, track team productivity, and collaborate seamlessly in one unified hub.",
+    myWorkspaces: "My Workspaces",
+    createNewTeam: "Create New Team",
+    noWorkspacesFound: "No workspaces found",
+    noWorkspacesDesc: "Try a different search term or create a new team.",
+    createFirstTeam: "Create First Team",
+    ownerLabel: "Owner",
+    memberLabel: "Member",
+    noDescProvided: "No description provided",
+    createWorkspace: "Create Workspace",
+    teamName: "Team Name",
+    teamNamePlaceholder: "e.g. Engineering Team",
+    descOptional: "Description (Optional)",
+    teamDescPlaceholder: "What is this team's primary goal?",
+    btnCreateTeam: "Create Team",
+    signInRequired: "Sign in required",
+    signInDesc: "You need to be logged in to view your teams, invite members, and collaborate on shared tasks.",
+    btnSignInNow: "Sign In Now",
+    btnCreateAccount: "Create Account",
+
+    // Team Detail
+    backToWorkspaces: "Back to Workspaces",
+    teamMembers: "Team Members",
+    teamTasks: "Team Tasks",
+    teamTasksDesc: "Manage and track progress for all team assignments.",
+    addMember: "Add Member",
+    addMemberDesc: "Invite a new member to collaborate.",
+    userEmail: "User Email",
+    emailPlaceholder: "e.g. member@example.com",
+    btnAdd: "Add",
+    btnAdding: "Adding...",
+    noMembers: "No members yet",
+    viewAsGrid: "Grid View",
+    viewAsList: "List View",
+    searchTasks: "Search tasks...",
   },
   vi: {
     // Navbar
@@ -110,7 +149,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Hero & Stats
     badgeSubtitle: "Không gian làm việc thông minh & tinh tế",
-    heroTitle: "Quản lý Nhiệm vụ & Đội nhóm Dễ dàng",
+    heroTitle: "Quản lý Nhiệm vụ",
     heroDesc:
       "Bảng quản lý công việc hiện đại kết nối Supabase PostgreSQL với khả năng theo dõi trạng thái tức thì, bộ lọc tiện lợi cùng giao diện pastel êm dịu.",
     statTotal: "Tổng nhiệm vụ",
@@ -181,6 +220,45 @@ const translations: Record<Language, Record<string, string>> = {
     // Footer
     footerSubtitle: "Hiệu suất thông minh, nhẹ nhàng & trực quan",
     footerCopy: "Ứng dụng Quản lý Nhiệm vụ & Nhóm. Xây dựng cho Assignment 1.",
+
+    // Teams Dashboard
+    cmdCenter: "Trung tâm Điều khiển",
+    welcomeBack: "Chào mừng trở lại",
+    teamsHeroDesc: "Quản lý không gian làm việc, theo dõi tiến độ nhóm và cộng tác mượt mà trong một trung tâm duy nhất.",
+    myWorkspaces: "Không gian làm việc",
+    createNewTeam: "Tạo Nhóm Mới",
+    noWorkspacesFound: "Không tìm thấy không gian làm việc nào",
+    noWorkspacesDesc: "Hãy thử thay đổi từ khóa tìm kiếm hoặc tạo nhóm mới.",
+    createFirstTeam: "Tạo Nhóm Đầu Tiên",
+    ownerLabel: "Trưởng nhóm",
+    memberLabel: "Thành viên",
+    noDescProvided: "Không có mô tả",
+    createWorkspace: "Tạo Không Gian Làm Việc",
+    teamName: "Tên nhóm",
+    teamNamePlaceholder: "Ví dụ: Nhóm Kỹ Thuật",
+    descOptional: "Mô tả (Tùy chọn)",
+    teamDescPlaceholder: "Mục tiêu chính của nhóm là gì?",
+    btnCreateTeam: "Tạo Nhóm",
+    signInRequired: "Yêu cầu đăng nhập",
+    signInDesc: "Bạn cần đăng nhập để xem danh sách nhóm, mời thành viên và cộng tác trên các nhiệm vụ chung.",
+    btnSignInNow: "Đăng nhập ngay",
+    btnCreateAccount: "Tạo tài khoản",
+
+    // Team Detail
+    backToWorkspaces: "Quay lại Không gian làm việc",
+    teamMembers: "Thành viên nhóm",
+    teamTasks: "Nhiệm vụ của nhóm",
+    teamTasksDesc: "Quản lý và theo dõi tiến độ công việc chung của toàn nhóm.",
+    addMember: "Thêm thành viên",
+    addMemberDesc: "Mời thành viên mới tham gia không gian làm việc.",
+    userEmail: "Email người dùng",
+    emailPlaceholder: "Ví dụ: member@example.com",
+    btnAdd: "Thêm",
+    btnAdding: "Đang thêm...",
+    noMembers: "Chưa có thành viên nào",
+    viewAsGrid: "Dạng Lưới",
+    viewAsList: "Dạng Danh sách",
+    searchTasks: "Tìm kiếm nhiệm vụ...",
   },
 };
 

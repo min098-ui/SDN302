@@ -44,19 +44,19 @@ function ToastItem({
   const icons = {
     success: <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />,
     error: <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />,
-    info: <Info className="w-5 h-5 text-sky-500 shrink-0" />,
+    info: <Info className="w-5 h-5 text-primary-500 shrink-0" />,
   };
 
   const borderStyles = {
     success: "border-emerald-200 bg-white/95 text-slate-800 shadow-emerald-500/10",
     error: "border-rose-200 bg-white/95 text-slate-800 shadow-rose-500/10",
-    info: "border-sky-200 bg-white/95 text-slate-800 shadow-sky-500/10",
+    info: "border-primary-200 bg-white/95 text-slate-800 shadow-primary-500/10",
   };
 
   const badgeStyles = {
     success: "bg-emerald-50 text-emerald-700 border-emerald-200",
     error: "bg-rose-50 text-rose-700 border-rose-200",
-    info: "bg-sky-50 text-sky-700 border-sky-200",
+    info: "bg-primary-50 text-primary-700 border-primary-200",
   };
 
   return (

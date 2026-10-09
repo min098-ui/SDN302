@@ -35,11 +35,11 @@ export default function DeleteConfirmModal({
             <div className="w-10 h-10 flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/mascot-fox.png"
-                alt="Snow Fox Mascot"
+                src="/mascot-bunny-nobg.png"
+                alt="Snow Bunny Mascot"
                 width={38}
                 height={38}
-                className="object-contain drop-shadow-xs mascot-fox-img"
+                className="mascot-bunny-img object-contain drop-shadow-xs animate-cute-float"
               />
             </div>
             <div>

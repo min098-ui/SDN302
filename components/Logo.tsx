@@ -11,6 +11,7 @@ interface LogoProps {
   className?: string;
   href?: string;
   animate?: boolean;
+  layout?: "col" | "row";
 }
 
 export default function Logo({
@@ -21,6 +22,7 @@ export default function Logo({
   className = "",
   href,
   animate = true,
+  layout = "col",
 }: LogoProps) {
   // Dimensions mapping
   const sizeMap = {
@@ -34,18 +36,18 @@ export default function Logo({
 
   const content = (
     <div className={`flex items-center gap-2.5 select-none ${className}`}>
-      {/* Pure Transparent Snow Fox Mascot - No white box! */}
+      {/* Pure Transparent Snow Bunny Mascot - No white box! */}
       <div className="relative group shrink-0">
         <div
           className={`${currentSize.box} relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/mascot-fox.png"
-            alt="Snow Fox Mascot Logo"
+          <img 
+            src="/mascot-bunny-nobg.png"
+            alt="Snow Bunny Mascot Logo"
             width={currentSize.img}
             height={currentSize.img}
-            className={`object-contain drop-shadow-md mascot-fox-img transition-transform duration-300 ${
+            className={`mascot-bunny-img object-contain drop-shadow-md transition-transform duration-300 ${
               animate ? "animate-cute-float" : ""
             }`}
           />
@@ -59,20 +61,20 @@ export default function Logo({
 
       {/* Brand Typography */}
       {showText && (
-        <div className="flex flex-col">
+        <div className={`flex ${layout === "row" ? "flex-row items-center gap-2" : "flex-col"}`}>
           <div className="flex items-center gap-1.5 leading-none">
             <span
               className={`font-black tracking-tight theme-gradient-text ${currentSize.text}`}
             >
-              TaskSync
+              AuraSync
             </span>
           </div>
 
           {showSubtitle && (
             <span
-              className={`text-slate-500 dark:text-slate-400 font-medium tracking-wide mt-0.5 ${currentSize.sub}`}
+              className={`text-slate-500 dark:text-slate-400 font-medium tracking-wide ${layout === "col" ? "mt-0.5" : ""} ${currentSize.sub}`}
             >
-              {subtitle}
+              {layout === "row" ? `· ${subtitle}` : subtitle}
             </span>
           )}
         </div>

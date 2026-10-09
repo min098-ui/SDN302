@@ -24,14 +24,14 @@ export default function LanguageToggle() {
       onClick={toggleLanguage}
       type="button"
       title={language === "en" ? "Chuyển sang Tiếng Việt" : "Switch to English"}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs border bg-white/90 hover:bg-slate-50/90 text-slate-700 border-slate-200/90 hover:border-sky-300"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs border bg-white/90 hover:bg-slate-50/90 text-slate-700 border-slate-200/90 hover:border-primary-300"
     >
-      <Globe className="w-3.5 h-3.5 text-sky-500 transition-transform hover:rotate-45" />
+      <Globe className="w-3.5 h-3.5 text-primary-500 transition-transform hover:rotate-45" />
 
       <span className="inline-flex items-center gap-1 text-[11px] font-bold tracking-wide">
         <span
           className={`transition-colors ${
-            language === "en" ? "text-sky-600 font-extrabold" : "text-slate-400 font-medium"
+            language === "en" ? "text-primary-600 font-extrabold" : "text-slate-400 font-medium"
           }`}
         >
           EN

@@ -51,13 +51,13 @@ export default function ThemePaletteToggle() {
       title={tooltipText}
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-2xs border ${
         theme === "ocean"
-          ? "bg-white/90 hover:bg-sky-50 text-sky-800 border-sky-200/90 shadow-sky-500/10"
+          ? "bg-white/90 hover:bg-primary-50 text-primary-800 border-primary-200/90 shadow-primary-500/10"
           : "bg-white/90 hover:bg-amber-50 text-amber-800 border-amber-200/90 shadow-amber-500/10"
       }`}
     >
       <Palette
         className={`w-3.5 h-3.5 transition-transform ${
-          theme === "sunset" ? "text-amber-500 rotate-12" : "text-sky-500"
+          theme === "sunset" ? "text-amber-500 rotate-12" : "text-primary-500"
         }`}
       />
 
@@ -65,12 +65,12 @@ export default function ThemePaletteToggle() {
       <span className="flex items-center -space-x-1">
         <span
           className={`w-2 h-2 rounded-full ring-1 ring-white ${
-            theme === "ocean" ? "bg-sky-400" : "bg-orange-400"
+            theme === "ocean" ? "bg-primary-400" : "bg-orange-400"
           }`}
         />
         <span
           className={`w-2 h-2 rounded-full ring-1 ring-white ${
-            theme === "ocean" ? "bg-purple-500" : "bg-rose-500"
+            theme === "ocean" ? "bg-secondary-500" : "bg-rose-500"
           }`}
         />
       </span>
