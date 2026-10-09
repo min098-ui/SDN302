@@ -92,7 +92,7 @@ export default function TeamDetailPage() {
     }
   }, [status, teamId]);
 
-  const fetchTeamData = async () => {
+  async function fetchTeamData() {
     try {
       const [teamRes, tasksRes] = await Promise.all([
         fetch(`/api/teams/${teamId}`),

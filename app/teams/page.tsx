@@ -28,7 +28,7 @@ export default function TeamsPage() {
     }
   }, [status]);
 
-  const fetchTeams = async () => {
+  async function fetchTeams() {
     try {
       const res = await fetch("/api/teams");
       if (res.ok) {
