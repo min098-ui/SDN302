@@ -187,20 +187,55 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🌟 Assignment 1 Deliverables Checklist
+## 🌟 Assignment Deliverables Checklist
 
+### Assignment 1 & 2
 - [x] Next.js App Router project initialized with TypeScript and Tailwind CSS.
-- [x] Clean folder structure (`app/`, `components/`, `lib/`, `prisma/`).
-- [x] ESLint and Prettier configured with `.prettierrc`.
-- [x] `.env.example` included without real secrets.
-- [x] Git repository initialized with `.gitignore`.
-- [x] Prisma ORM setup with 4 core models (`User`, `Team`, `TeamMember`, `Task`).
-- [x] Homepage with application description and navigation bar.
-- [x] Public Task CRUD operations (Create, Read, Update, Delete) with API Route Handlers.
-- [x] Automatic task board refresh after actions (no manual reload).
-- [x] "Coming soon" placeholder for Teams (`/teams`).
-- [x] **Bonus**: Client-side validation for task form.
-- [x] **Bonus**: Status filter pills ("All", "To Do", "In Progress", "Done").
-- [x] **Bonus**: Search input for tasks.
-- [x] **Bonus**: GitHub Actions CI workflow (`.github/workflows/ci.yml`).
-- [x] **Bonus**: Mermaid Entity Relationship Diagram (ERD).
+- [x] Authentication with NextAuth.js (credentials provider & bcrypt hashing).
+- [x] Full team workspaces CRUD and member invitations.
+- [x] Public & Team Kanban Task Boards.
+
+### Assignment 3 & 4 (Real-time Collaboration & Advanced Features)
+- [x] **Real-time Team Chat**:
+  - Each team has a dedicated chat room.
+  - Persisted message history (`Message` model in PostgreSQL via Prisma).
+  - Instant live messaging without page refresh across all online members.
+  - Unified real-time support (Pusher, Supabase Realtime, and smart SSE / polling fallback).
+  - **Bonus**: Real-time typing indicators ("Alice is typing...").
+  - **Bonus**: Image & file attachments in chat messages.
+- [x] **Live Task Board Updates (Real-time Kanban)**:
+  - Instant live updates across teammates when tasks are created, updated, dragged, or deleted.
+  - Optimistic UI updates with zero-delay collaboration.
+- [x] **Notification System**:
+  - In-app notification bell with live unread badge count.
+  - Triggered on task assignment and team invitation.
+  - Mark single / mark all notifications as read.
+  - **Bonus**: Browser desktop push notification support (`Notification API`).
+- [x] **Advanced Role & Permission System (RBAC)**:
+  - **Owner**: Full control (manage members, change roles, delete team, delete any task, edit settings).
+  - **Admin**: Can manage members & roles (Member <-> Admin), create/edit/delete all tasks. Cannot delete the team.
+  - **Member**: Can create tasks, edit and manage their assigned tasks & status, participate in team chat. Cannot delete other members' tasks or manage team members.
+  - Enforced strictly on both client UI and server API route handlers.
+- [x] **Bonus: Team Activity Audit Trail**:
+  - Full audit trail logging who created, updated, or deleted tasks, invited members, or changed roles.
+  - Live activity log feed in team workspace.
+
+---
+
+## 📝 Submission Information
+
+> Fill in the fields below exactly as labeled, on their own line. Leave a field as "N/A" if it does not apply to you.
+
+Student ID: __________  
+Full Name: __________  
+GitHub Repository URL: __________  
+Deployed Website URL (Vercel): __________  
+Separate Backend URL (NestJS on Render) — write N/A if not used: N/A  
+Real-time mechanism used (Supabase Realtime / Socket.io / Pusher / Ably): Pusher & Supabase Realtime  
+Test Account 1 Email: __________  
+Test Account 1 Password: __________  
+Test Account 2 Email (must be on the SAME team as Account 1, to test real-time between two sessions): __________  
+Test Account 2 Password: __________  
+Both test accounts are already email-verified / ready to log in immediately, with no confirmation link needed (Yes / No): Yes  
+Demo video link (YouTube/Drive/Loom, 2–3 minutes, showing live chat and live task updates across two sessions): __________  
+

@@ -135,6 +135,25 @@ const translations: Record<Language, Record<string, string>> = {
     viewAsGrid: "Grid View",
     viewAsList: "List View",
     searchTasks: "Search tasks...",
+
+    // Assignment 3 & 4: Real-time & Collaboration
+    tabBoard: "Kanban Board",
+    tabChat: "Team Chat",
+    tabMembers: "Members & Roles",
+    tabActivity: "Activity Audit",
+    notifications: "Notifications",
+    markAllRead: "Mark all read",
+    noNotifications: "No notifications yet",
+    realtimeConnected: "Live Sync Active",
+    roleOwner: "Owner",
+    roleAdmin: "Admin",
+    roleMember: "Member",
+    chatPlaceholder: "Type a message...",
+    send: "Send",
+    online: "online",
+    typing: "is typing...",
+    severalTyping: "are typing...",
+    auditTrail: "Team Activity Audit Trail",
   },
   vi: {
     // Navbar
@@ -259,6 +278,25 @@ const translations: Record<Language, Record<string, string>> = {
     viewAsGrid: "Dạng Lưới",
     viewAsList: "Dạng Danh sách",
     searchTasks: "Tìm kiếm nhiệm vụ...",
+
+    // Assignment 3 & 4: Real-time & Collaboration
+    tabBoard: "Bảng Kanban",
+    tabChat: "Chat Nhóm Trực Tiếp",
+    tabMembers: "Thành viên & Phân quyền",
+    tabActivity: "Nhật ký Hoạt động",
+    notifications: "Thông báo",
+    markAllRead: "Đánh dấu tất cả đã đọc",
+    noNotifications: "Chưa có thông báo nào",
+    realtimeConnected: "Đồng bộ Trực tiếp",
+    roleOwner: "Chủ nhóm (Owner)",
+    roleAdmin: "Quản trị viên (Admin)",
+    roleMember: "Thành viên (Member)",
+    chatPlaceholder: "Nhập tin nhắn trao đổi...",
+    send: "Gửi",
+    online: "đang trực tuyến",
+    typing: "đang nhập...",
+    severalTyping: "đang nhập tin nhắn...",
+    auditTrail: "Nhật ký Hoạt động Nhóm",
   },
 };
 

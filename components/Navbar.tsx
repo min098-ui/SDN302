@@ -6,6 +6,7 @@ import { Users, LogIn, CheckSquare, LogOut, LayoutDashboard } from "lucide-react
 import Logo from "@/components/Logo";
 import ThemePaletteToggle from "@/components/ThemePaletteToggle";
 import LanguageToggle from "@/components/LanguageToggle";
+import NotificationBell from "@/components/NotificationBell";
 import { useLanguage } from "@/lib/languageContext";
 import { useSession, signOut } from "next-auth/react";
 
@@ -85,6 +86,7 @@ export default function Navbar() {
              </Link>
           </div>
 
+           <NotificationBell />
           <LanguageToggle />
           <ThemePaletteToggle />
 
