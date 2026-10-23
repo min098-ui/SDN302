@@ -78,7 +78,7 @@ export default function TeamActivityLog({ teamId }: TeamActivityLogProps) {
             {t("auditTrail")}
           </h3>
           <p className="text-xs font-medium text-slate-500 mt-1">
-            Real-time audit log of all changes, assignments, and member management.
+            {t("auditLogSubtitle")}
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export default function TeamActivityLog({ teamId }: TeamActivityLogProps) {
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200/80"
               }`}
             >
-              {opt === "ALL" ? "All Activity" : opt === "TASKS" ? "Tasks" : "Members"}
+              {opt === "ALL" ? t("filterAll") : opt === "TASKS" ? t("filterTasks") : t("filterMembers")}
             </button>
           ))}
         </div>
@@ -107,8 +107,8 @@ export default function TeamActivityLog({ teamId }: TeamActivityLogProps) {
         ) : filteredLogs.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <Clock className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p className="text-sm font-semibold text-slate-600">No activity recorded yet</p>
-            <p className="text-xs text-slate-400 mt-1">Actions performed by team members will appear live here.</p>
+            <p className="text-sm font-semibold text-slate-600">{t("noActivityYet")}</p>
+            <p className="text-xs text-slate-400 mt-1">{t("activityHint")}</p>
           </div>
         ) : (
           <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-100">

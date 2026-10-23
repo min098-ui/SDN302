@@ -48,7 +48,7 @@ export default function Navbar() {
               }`}
             >
               <LayoutDashboard className="w-4.5 h-4.5" style={{ color: pathname.startsWith("/teams") || pathname.startsWith("/dashboard") ? "var(--accent-color)" : undefined }} />
-              <span>Teams & Workspace</span>
+              <span>{t("navTeams")}</span>
             </Link>
           </div>
         </nav>

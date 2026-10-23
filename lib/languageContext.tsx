@@ -15,7 +15,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     // Navbar
     navTasks: "Tasks",
-    navTeams: "Teams",
+    navTeams: "Teams & Workspace",
     navSoon: "SOON",
     navSignIn: "Sign In",
     liveWorkspace: "Live Workspace",
@@ -154,11 +154,43 @@ const translations: Record<Language, Record<string, string>> = {
     typing: "is typing...",
     severalTyping: "are typing...",
     auditTrail: "Team Activity Audit Trail",
+
+    // Team Chat & Realtime
+    chatRoom: "Team Chat",
+    chatConnected: "Live Sync Active",
+    connecting: "Connecting...",
+    noMessagesYet: "No messages in team chat yet",
+    startChatHint: "Say hello to your teammates and start collaborating in real-time!",
+    attachFileTooltip: "Attach image or file",
+
+    // RBAC & Members
+    rbacMatrix: "Role-Based Access Control (RBAC) Matrix",
+    rbacOwnerDesc: "Full control: manage all members & roles, edit/delete any task, update team settings, or delete the team.",
+    rbacAdminDesc: "Can invite members, manage member roles, and edit/delete all team tasks. Cannot delete the team.",
+    rbacMemberDesc: "Can create tasks, update their assigned tasks & status, participate in team chat. Cannot delete other members' tasks.",
+    teamRoster: "Team Roster",
+    yourCurrentRole: "Your current role:",
+    inviteTeammate: "Invite Teammate",
+    inviteTeammateDesc: "Only Owners and Admins have permission to invite new members.",
+    emailAddress: "Email Address",
+    initialRole: "Initial Role",
+    btnSendInvite: "Send Invite",
+    btnInviting: "Inviting...",
+    leaveTeam: "Leave Team",
+    removeMember: "Remove Member",
+
+    // Activity Log
+    auditLogSubtitle: "Real-time audit log of all changes, assignments, and member management.",
+    filterAll: "All Activity",
+    filterTasks: "Tasks",
+    filterMembers: "Members",
+    noActivityYet: "No activity recorded yet",
+    activityHint: "Actions performed by team members will appear live here.",
   },
   vi: {
     // Navbar
     navTasks: "Nhiệm vụ",
-    navTeams: "Nhóm",
+    navTeams: "Nhóm & Không gian làm việc",
     navSoon: "SẮP RA",
     navSignIn: "Đăng nhập",
     liveWorkspace: "Không gian làm việc",
@@ -249,7 +281,7 @@ const translations: Record<Language, Record<string, string>> = {
     noWorkspacesFound: "Không tìm thấy không gian làm việc nào",
     noWorkspacesDesc: "Hãy thử thay đổi từ khóa tìm kiếm hoặc tạo nhóm mới.",
     createFirstTeam: "Tạo Nhóm Đầu Tiên",
-    ownerLabel: "Trưởng nhóm",
+    ownerLabel: "Chủ nhóm",
     memberLabel: "Thành viên",
     noDescProvided: "Không có mô tả",
     createWorkspace: "Tạo Không Gian Làm Việc",
@@ -297,6 +329,38 @@ const translations: Record<Language, Record<string, string>> = {
     typing: "đang nhập...",
     severalTyping: "đang nhập tin nhắn...",
     auditTrail: "Nhật ký Hoạt động Nhóm",
+
+    // Team Chat & Realtime
+    chatRoom: "Trò chuyện nhóm",
+    chatConnected: "Đồng bộ Trực tiếp",
+    connecting: "Đang kết nối...",
+    noMessagesYet: "Chưa có tin nhắn nào trong phòng chat",
+    startChatHint: "Hãy gửi lời chào đến các thành viên trong nhóm và bắt đầu trao đổi!",
+    attachFileTooltip: "Đính kèm ảnh hoặc tệp",
+
+    // RBAC & Members
+    rbacMatrix: "Ma trận Phân quyền Vai trò (RBAC)",
+    rbacOwnerDesc: "Toàn quyền: quản lý thành viên & vai trò, sửa/xóa mọi nhiệm vụ, chỉnh sửa hoặc xóa nhóm.",
+    rbacAdminDesc: "Có thể mời thành viên, phân quyền thành viên và sửa/xóa nhiệm vụ của nhóm. Không thể xóa nhóm.",
+    rbacMemberDesc: "Có thể tạo nhiệm vụ, cập nhật trạng thái nhiệm vụ được giao, tham gia chat nhóm. Không thể xóa nhiệm vụ của người khác.",
+    teamRoster: "Danh sách Thành viên",
+    yourCurrentRole: "Vai trò hiện tại của bạn:",
+    inviteTeammate: "Mời Thành viên Mới",
+    inviteTeammateDesc: "Chỉ Chủ nhóm và Quản trị viên mới có quyền mời thành viên mới.",
+    emailAddress: "Địa chỉ Email",
+    initialRole: "Vai trò Ban đầu",
+    btnSendInvite: "Gửi Lời mời",
+    btnInviting: "Đang gửi...",
+    leaveTeam: "Rời nhóm",
+    removeMember: "Xóa thành viên",
+
+    // Activity Log
+    auditLogSubtitle: "Nhật ký thời gian thực ghi lại toàn bộ thay đổi, phân công và quản lý thành viên.",
+    filterAll: "Tất cả hoạt động",
+    filterTasks: "Nhiệm vụ",
+    filterMembers: "Thành viên",
+    noActivityYet: "Chưa có hoạt động nào được ghi lại",
+    activityHint: "Các hành động của thành viên trong nhóm sẽ xuất hiện trực tiếp tại đây.",
   },
 };
 
@@ -308,7 +372,7 @@ const LanguageContext = createContext<LanguageContextType>({
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>("vi");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -317,6 +381,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem("app-language") as Language | null;
     if (saved === "vi" || saved === "en") {
       setLanguageState(saved);
+    } else {
+      setLanguageState("vi");
+      localStorage.setItem("app-language", "vi");
     }
   }, []);
 
@@ -332,8 +399,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = (key: string): string => {
     if (!mounted) {
-      // Default to english before mount to prevent SSR mismatch
-      return translations.en[key] || key;
+      return translations.vi[key] || translations.en[key] || key;
     }
     return translations[language]?.[key] || translations.en[key] || key;
   };

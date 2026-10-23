@@ -554,7 +554,7 @@ export default function TeamDetailPage() {
                 ) : (
                   <Users className="w-3.5 h-3.5 text-slate-300" />
                 )}
-                <span>Role: {currentUserRole}</span>
+                <span>{t("yourCurrentRole")} {currentUserRole}</span>
               </div>
 
               {/* Real-time Indicator Badge */}
@@ -563,7 +563,7 @@ export default function TeamDetailPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span>{isConnected ? `Live: ${provider.toUpperCase()}` : "Connecting..."}</span>
+                <span>{isConnected ? `${t("chatConnected")}: ${provider.toUpperCase()}` : t("connecting")}</span>
               </div>
 
               {/* Team Settings / Delete Buttons (Owner / Admin) */}
@@ -604,7 +604,7 @@ export default function TeamDetailPage() {
           <div className="flex flex-wrap gap-4 shrink-0">
             <div className="px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-center min-w-[130px] shadow-inner">
               <p className="text-[10px] font-bold text-primary-200 uppercase tracking-widest mb-1">
-                Members
+                {t("filterMembers")}
               </p>
               <p className="text-3xl font-black">
                 {team.members.filter((m: any) => m.user.id !== team.owner.id).length + 1}
@@ -612,7 +612,7 @@ export default function TeamDetailPage() {
             </div>
             <div className="px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-center min-w-[130px] shadow-inner">
               <p className="text-[10px] font-bold text-primary-200 uppercase tracking-widest mb-1">
-                Tasks
+                {t("filterTasks")}
               </p>
               <p className="text-3xl font-black">{tasks.length}</p>
             </div>

@@ -228,7 +228,7 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
           </div>
           <div>
             <h3 className="font-extrabold text-slate-900 text-base flex items-center gap-2">
-              {teamName} {t("tabChat")}
+              {teamName} &bull; {t("chatRoom")}
             </h3>
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 relative">
@@ -236,7 +236,7 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
                 <span className={`relative inline-flex rounded-full h-2 w-2 ${isConnected ? "bg-emerald-500" : "bg-amber-500"}`}></span>
               </span>
               <span className="text-[11px] font-semibold text-slate-500">
-                {isConnected ? `Real-time Active (${provider.toUpperCase()})` : "Connecting..."}
+                {isConnected ? `${t("chatConnected")} (${provider.toUpperCase()})` : t("connecting")}
               </span>
             </div>
           </div>
@@ -254,9 +254,9 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
             <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-3">
               <Sparkles className="w-8 h-8 text-slate-300" />
             </div>
-            <p className="font-bold text-slate-600 text-sm">No messages in team chat yet</p>
+            <p className="font-bold text-slate-600 text-sm">{t("noMessagesYet")}</p>
             <p className="text-xs text-slate-400 mt-1 max-w-xs">
-              Say hello to your teammates and start collaborating in real-time!
+              {t("startChatHint")}
             </p>
           </div>
         ) : (
