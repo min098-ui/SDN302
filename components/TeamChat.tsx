@@ -79,6 +79,8 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
     return () => clearInterval(timer);
   }, []);
 
+  const lastTypingSentRef = useRef<number>(0);
+
   // Real-time subscription for chat messages and typing
   const { isConnected, provider } = useRealtimeSubscription({
     channel: `team-${teamId}`,
@@ -103,7 +105,7 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
               ...prev,
               [data.userId]: {
                 name: data.userName || "Teammate",
-                expires: Date.now() + 3000,
+                expires: Date.now() + 4500,
               },
             }));
           } else {
@@ -120,10 +122,28 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
 
   // Handle typing broadcast
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputText(e.target.value);
+    const val = e.target.value;
+    setInputText(val);
 
-    // Broadcast typing event with debounce
-    if (!typingTimeoutRef.current) {
+    // If input is cleared, immediately broadcast stop typing
+    if (!val.trim()) {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      fetch(`/api/teams/${teamId}/chat/typing`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isTyping: false }),
+      }).catch(() => {});
+      lastTypingSentRef.current = 0;
+      return;
+    }
+
+    // Broadcast typing event throttle every 1.5s while actively typing
+    const now = Date.now();
+    if (now - lastTypingSentRef.current > 1500) {
+      lastTypingSentRef.current = now;
       fetch(`/api/teams/${teamId}/chat/typing`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -131,6 +151,7 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
       }).catch(() => {});
     }
 
+    // Reset idle timeout: stop typing indicator after 3.5s of no keypresses
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
@@ -142,7 +163,8 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
         body: JSON.stringify({ isTyping: false }),
       }).catch(() => {});
       typingTimeoutRef.current = null;
-    }, 2000);
+      lastTypingSentRef.current = 0;
+    }, 3500);
   };
 
   // Handle image / file attachment conversion to DataURL
@@ -178,6 +200,18 @@ export default function TeamChat({ teamId, teamName }: TeamChatProps) {
 
     const content = inputText.trim();
     const currentAttachment = attachment;
+
+    // Immediately stop typing indicator
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+    fetch(`/api/teams/${teamId}/chat/typing`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isTyping: false }),
+    }).catch(() => {});
+    lastTypingSentRef.current = 0;
 
     setInputText("");
     setAttachment(null);

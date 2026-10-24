@@ -19,6 +19,8 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [browserPermission, setBrowserPermission] = useState<NotificationPermission>("default");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const prevUnreadRef = useRef<number>(0);
+  const prevNotifIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -26,77 +28,113 @@ export default function NotificationBell() {
     }
   }, []);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (isPolling = false) => {
     if (!userId) return;
     try {
       const res = await fetch("/api/notifications");
       if (res.ok) {
         const data = await res.json();
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
+        const newNotifs: any[] = data.notifications || [];
+        const newUnread: number = data.unreadCount || 0;
+
+        if (isPolling) {
+          // Detect newly created notifications since last poll
+          const currentIds = new Set(newNotifs.map((n: any) => n.id));
+          const brandNew = newNotifs.filter(
+            (n: any) => !prevNotifIdsRef.current.has(n.id) && !n.isRead
+          );
+
+          if (brandNew.length > 0) {
+            // Show toast for each new notification
+            brandNew.forEach((notif: any) => {
+              toast.custom(
+                (tToast) => (
+                  <div
+                    className={`${
+                      tToast.visible ? "animate-enter" : "animate-leave"
+                    } max-w-md w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex ring-1 ring-black/5 p-4 border border-primary-200`}
+                  >
+                    <div className="flex-1 w-0">
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 pt-0.5">
+                          <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center font-bold">
+                            <Bell className="w-5 h-5 animate-bounce" />
+                          </div>
+                        </div>
+                        <div className="ml-3 flex-1">
+                          <p className="text-sm font-black text-slate-900">{notif.title}</p>
+                          <p className="mt-1 text-xs font-medium text-slate-600">{notif.message}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex border-l border-slate-100 pl-3">
+                      <button
+                        onClick={() => toast.dismiss(tToast.id)}
+                        className="w-full border border-transparent rounded-none rounded-r-lg p-1 flex items-center justify-center text-xs font-bold text-slate-400 hover:text-slate-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ),
+                { duration: 5000 }
+              );
+
+              // Browser push notification
+              if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+                try {
+                  new Notification(notif.title, {
+                    body: notif.message,
+                    icon: "/favicon.ico",
+                  });
+                } catch {}
+              }
+            });
+          }
+
+          prevNotifIdsRef.current = currentIds;
+        } else {
+          // First load — seed the known IDs without showing toasts
+          prevNotifIdsRef.current = new Set(newNotifs.map((n: any) => n.id));
+        }
+
+        prevUnreadRef.current = newUnread;
+        setNotifications(newNotifs);
+        setUnreadCount(newUnread);
       }
     } catch {
-      // ignore
+      // ignore network errors
     }
   };
 
+  // Initial fetch
   useEffect(() => {
     if (userId) {
-      fetchNotifications();
+      fetchNotifications(false);
     }
   }, [userId]);
 
-  // Real-time notification subscription
+  // Polling every 10 seconds as the reliable mechanism
+  useEffect(() => {
+    if (!userId) return;
+    const interval = setInterval(() => {
+      fetchNotifications(true);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [userId]);
+
+  // Real-time subscription (bonus — works if Pusher/SSE available)
   useRealtimeSubscription({
     channel: userId ? `user-${userId}` : null,
     onEvent: (event, data) => {
       if (event === "notification:new" && data) {
-        setNotifications((prev) => [data, ...prev]);
+        // Avoid duplicate with polling: only add if not already in list
+        setNotifications((prev) => {
+          if (prev.find((n) => n.id === data.id)) return prev;
+          prevNotifIdsRef.current.add(data.id);
+          return [data, ...prev];
+        });
         setUnreadCount((c) => c + 1);
-
-        // Show toast
-        toast.custom(
-          (tToast) => (
-            <div
-              className={`${
-                tToast.visible ? "animate-enter" : "animate-leave"
-              } max-w-md w-full bg-white shadow-xl rounded-2xl pointer-events-auto flex ring-1 ring-black/5 p-4 border border-primary-200`}
-            >
-              <div className="flex-1 w-0">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 pt-0.5">
-                    <div className="w-9 h-9 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center font-bold">
-                      <Bell className="w-5 h-5 animate-bounce" />
-                    </div>
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <p className="text-sm font-black text-slate-900">{data.title}</p>
-                    <p className="mt-1 text-xs font-medium text-slate-600">{data.message}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex border-l border-slate-100 pl-3">
-                <button
-                  onClick={() => toast.dismiss(tToast.id)}
-                  className="w-full border border-transparent rounded-none rounded-r-lg p-1 flex items-center justify-center text-xs font-bold text-slate-400 hover:text-slate-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ),
-          { duration: 5000 }
-        );
-
-        // Browser push notification
-        if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-          try {
-            new Notification(data.title, {
-              body: data.message,
-              icon: "/favicon.ico",
-            });
-          } catch {}
-        }
       }
     },
   });
