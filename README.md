@@ -231,7 +231,7 @@ Full Name: __________
 GitHub Repository URL: __________  
 Deployed Website URL (Vercel): __________  
 Separate Backend URL (NestJS on Render) — write N/A if not used: N/A  
-Real-time mechanism used (Supabase Realtime / Socket.io / Pusher / Ably): Pusher & Supabase Realtime  
+Real-time mechanism used (Supabase Realtime / Socket.io / Pusher / Ably): Supabase Realtime  
 Test Account 1 Email: __________  
 Test Account 1 Password: __________  
 Test Account 2 Email (must be on the SAME team as Account 1, to test real-time between two sessions): __________  
